@@ -1,13 +1,13 @@
 import {
   Links,
   Meta,
+  Outlet,
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
 import type { LinksFunction, MetaFunction } from "@remix-run/cloudflare";
 
 import "./styles/tailwind.css";
-import { AnimatedOutlet } from "./components/ui/AnimatedOutlet";
 
 /**
  * Global meta tags for SEO
@@ -60,5 +60,5 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return <AnimatedOutlet />;
+  return <Outlet />;
 }
