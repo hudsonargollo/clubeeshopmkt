@@ -1,0 +1,16 @@
+# Local development environment variables for Cloudflare Workers
+# Copy this file to .dev.vars and fill in your values
+
+# Supabase Configuration
+# Get these from your Supabase project settings
+SUPABASE_URL=https://your-project-ref.supabase.co
+SUPABASE_ANON_KEY=your-anon-key-here
+
+# JWT Secret for edge validation (Requirements: 13.3, 13.4)
+# Get this from Supabase Dashboard > Settings > API > JWT Secret
+SUPABASE_JWT_SECRET=your-jwt-secret-here
+
+# Note: For production, set these as secrets using:
+# wrangler secret put SUPABASE_URL
+# wrangler secret put SUPABASE_ANON_KEY
+# wrangler secret put SUPABASE_JWT_SECRET

@@ -1,0 +1,66 @@
+{
+  "name": "clubeeshopmkt",
+  "version": "1.0.0",
+  "description": "Edge-Native Multi-Tenant Retail Operations Platform",
+  "private": true,
+  "sideEffects": false,
+  "type": "module",
+  "scripts": {
+    "dev": "remix vite:dev",
+    "build": "remix vite:build",
+    "start": "wrangler pages dev ./build/client",
+    "deploy": "npm run build && wrangler pages deploy ./build/client",
+    "typecheck": "tsc",
+    "test": "vitest --run",
+    "test:watch": "vitest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hudsonargollo/clubeeshopmkt.git"
+  },
+  "keywords": [
+    "retail",
+    "inventory",
+    "multi-tenant",
+    "cloudflare-workers"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hudsonargollo/clubeeshopmkt/issues"
+  },
+  "homepage": "https://github.com/hudsonargollo/clubeeshopmkt#readme",
+  "dependencies": {
+    "@cloudflare/workers-types": "^4.20260103.0",
+    "@radix-ui/react-slot": "^1.2.4",
+    "@remix-run/cloudflare": "^2.17.2",
+    "@remix-run/cloudflare-pages": "^2.17.2",
+    "@remix-run/dev": "^2.17.2",
+    "@remix-run/react": "^2.17.2",
+    "@supabase/supabase-js": "^2.89.0",
+    "autoprefixer": "^10.4.23",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "cmdk": "^1.1.1",
+    "fast-check": "^4.5.3",
+    "framer-motion": "^12.23.26",
+    "html5-qrcode": "^2.3.8",
+    "isbot": "^5.1.32",
+    "lucide-react": "^0.562.0",
+    "postcss": "^8.5.6",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-qr-code": "^2.0.18",
+    "tailwind-merge": "^3.4.0",
+    "tailwindcss": "^3.4.17",
+    "tailwindcss-animate": "^1.0.7",
+    "wrangler": "^3.114.16"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.0",
+    "vitest": "^4.0.16"
+  }
+}
