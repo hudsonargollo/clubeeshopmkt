@@ -10,6 +10,7 @@ import { json } from '@remix-run/cloudflare';
 import { useActionData, useNavigation, Form } from '@remix-run/react';
 import { motion } from 'framer-motion';
 import { createSupabaseClient, type Env } from '~/lib/supabase.server';
+import { ClientOnly } from '~/components/ui/ClientOnly';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card';
@@ -145,12 +146,28 @@ export default function LoginPage() {
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-400/20 rounded-full blur-3xl" />
       </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: 'easeOut' }}
-        className="w-full max-w-sm relative z-10"
-      >
+      <ClientOnly fallback={
+        <div className="w-full max-w-sm relative z-10">
+          <Card className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-2xl">
+            <CardHeader className="text-center pb-2">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 mx-auto mb-4">
+                <LogIn className="h-8 w-8 text-white" />
+              </div>
+              <CardTitle className="text-2xl">Welcome Back</CardTitle>
+              <CardDescription>Sign in to access the backoffice</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="h-11 bg-slate-100 rounded animate-pulse" />
+            </CardContent>
+          </Card>
+        </div>
+      }>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+          className="w-full max-w-sm relative z-10"
+        >
         {/* Glassmorphism Card */}
         <Card className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-2xl">
           <CardHeader className="text-center pb-2">
@@ -277,7 +294,8 @@ export default function LoginPage() {
             </a>
           </p>
         </motion.div>
-      </motion.div>
+        </motion.div>
+      </ClientOnly>
     </div>
   );
 }
