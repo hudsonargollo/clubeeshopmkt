@@ -24,7 +24,12 @@ interface ActionData {
 }
 
 export async function action({ request, context }: ActionFunctionArgs) {
-  const env = context.cloudflare.env as Env;
+  const env = context.cloudflare?.env as Env | undefined;
+  
+  if (!env?.SUPABASE_URL || !env?.SUPABASE_ANON_KEY) {
+    return json<ActionData>({ error: 'Server configuration error. Please contact support.' }, { status: 500 });
+  }
+  
   const formData = await request.formData();
   
   const email = formData.get('email') as string;
