@@ -33,6 +33,37 @@ export type { AnimatedOutletProps } from './AnimatedOutlet';
 export { SyncIndicator, SyncOverlay, useSyncStatus } from './SyncIndicator';
 export type { SyncIndicatorProps, SyncOverlayProps, SyncStatus } from './SyncIndicator';
 
+export { BentoGrid } from './BentoGrid';
+export type { BentoGridItem } from './BentoGrid';
+
+export {
+  Table,
+  TableHeader,
+  TableBody,
+  TableFooter,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableCaption,
+} from './table';
+
+export {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+  SelectLabel,
+  SelectSeparator,
+} from './select';
+
+export {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+} from './tabs';
+
 // Micro-interactions
 export {
   AnimatedButton,

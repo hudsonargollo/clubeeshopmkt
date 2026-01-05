@@ -17,7 +17,6 @@ import {
 } from '~/components/ui/drawer';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
-import { usePresence } from '~/hooks/usePresence';
 import { cn } from '~/lib/utils';
 
 export interface InventoryItem {
@@ -43,13 +42,6 @@ export interface InventoryEditDrawerProps {
   onDelete?: (itemId: string) => void;
   /** Whether save is in progress */
   isSaving?: boolean;
-  /** Presence configuration for collision prevention */
-  presenceConfig?: {
-    supabaseUrl: string;
-    supabaseAnonKey: string;
-    userId: string;
-    displayName: string;
-  };
 }
 
 /**
@@ -68,17 +60,9 @@ export function InventoryEditDrawer({
   onSave,
   onDelete,
   isSaving = false,
-  presenceConfig,
 }: InventoryEditDrawerProps) {
   const [formData, setFormData] = React.useState<InventoryItem | null>(null);
   const [errors, setErrors] = React.useState<Record<string, string>>({});
-
-  // Presence for edit collision prevention
-  const presence = presenceConfig && item ? usePresence({
-    ...presenceConfig,
-    channelName: `inventory:${item.id}`,
-    enabled: open,
-  }) : null;
 
   // Initialize form data when item changes
   React.useEffect(() => {
@@ -87,18 +71,6 @@ export function InventoryEditDrawer({
       setErrors({});
     }
   }, [item]);
-
-  // Join presence when drawer opens
-  React.useEffect(() => {
-    if (open && presence) {
-      presence.join('all');
-    }
-    return () => {
-      if (presence) {
-        presence.leave();
-      }
-    };
-  }, [open, presence]);
 
   const handleChange = (field: keyof InventoryItem, value: string | number) => {
     if (!formData) return;
@@ -157,13 +129,6 @@ export function InventoryEditDrawer({
           <DrawerDescription>
             {item.barcode} • {item.category}
           </DrawerDescription>
-          
-          {/* Presence indicator */}
-          {presence?.isBeingEditedByOther && presence.editingUser && (
-            <div className="mt-2 px-3 py-2 bg-yellow-100 dark:bg-yellow-900 rounded-md text-sm">
-              ⚠️ {presence.editingUser.displayName} is also editing this item
-            </div>
-          )}
         </DrawerHeader>
 
         <div className="px-4 py-2 space-y-4 overflow-y-auto">

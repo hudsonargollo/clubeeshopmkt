@@ -1,22 +1,28 @@
 /**
  * Product Card Component with Layout Animation
  * Requirements: 11.3 - Animate item "flying" to cart using Framer Motion layoutId
+ * Requirements: 16.1, 16.2, 16.3, 16.4 - Visual distinction for services
  * 
  * Product display card that animates when added to cart
  */
 
 import * as React from 'react';
 import { motion } from 'framer-motion';
-import { ShoppingCart, Plus, Package } from 'lucide-react';
+import { ShoppingCart, Plus, Package, Wrench } from 'lucide-react';
 import { Button } from '~/components/ui/button';
 import { formatCurrency } from '~/lib/orderUtils';
 import { cn } from '~/lib/utils';
 
+export type InventoryType = 'physical' | 'service';
+
 export interface ProductCardItem {
   id: string;
-  barcode: string;
+  type?: InventoryType;
+  barcode: string | null;
   name: string;
+  description?: string | null;
   category: string;
+  category_id?: string | null;
   price: number;
   stock: number;
   image_url?: string | null;
@@ -64,12 +70,16 @@ export function ProductCard({
   enableLayoutAnimation = true,
   className = '',
 }: ProductCardProps) {
-  const isOutOfStock = product.stock <= 0;
-  const isLowStock = product.stock > 0 && product.stock <= 5;
+  const isService = product.type === 'service';
+  const isOutOfStock = !isService && product.stock <= 0;
+  const isLowStock = !isService && product.stock > 0 && product.stock <= 5;
+
+  // Services are always "in stock" since they don't have inventory
+  const canAddToCart = isService || !isOutOfStock;
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!isOutOfStock && onAddToCart) {
+    if (canAddToCart && onAddToCart) {
       onAddToCart(product);
     }
   };
@@ -77,6 +87,9 @@ export function ProductCard({
   const handleClick = () => {
     onClick?.(product);
   };
+
+  // Get the appropriate icon based on type
+  const TypeIcon = isService ? Wrench : Package;
 
   const CardWrapper = enableLayoutAnimation ? motion.div : 'div';
   const cardProps = enableLayoutAnimation
@@ -98,6 +111,8 @@ export function ProductCard({
         'group relative bg-card rounded-xl border overflow-hidden cursor-pointer',
         'transition-shadow duration-200',
         isOutOfStock && 'opacity-60',
+        // Purple left border accent for services (Requirement 16.3)
+        isService && 'border-l-4 border-l-purple-500',
         className
       )}
       onClick={handleClick}
@@ -114,12 +129,26 @@ export function ProductCard({
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <Package className="h-12 w-12 text-muted-foreground/30" />
+            {/* Type-specific icon (Requirements 16.1, 16.2) */}
+            <TypeIcon className={cn(
+              "h-12 w-12",
+              isService ? "text-purple-400" : "text-muted-foreground/30"
+            )} />
           </div>
         )}
 
-        {/* Stock badge */}
-        {isOutOfStock && (
+        {/* Service badge (Requirement 16.3) */}
+        {isService && (
+          <div className="absolute top-2 left-2">
+            <span className="px-2 py-0.5 bg-purple-500 text-white text-xs font-medium rounded-full flex items-center gap-1">
+              <Wrench className="h-3 w-3" />
+              Service
+            </span>
+          </div>
+        )}
+
+        {/* Stock badge - only for physical products */}
+        {!isService && isOutOfStock && (
           <div className="absolute inset-0 bg-background/80 flex items-center justify-center">
             <span className="px-3 py-1 bg-destructive text-destructive-foreground text-sm font-medium rounded-full">
               Out of Stock
@@ -127,7 +156,7 @@ export function ProductCard({
           </div>
         )}
 
-        {isLowStock && !isOutOfStock && (
+        {isLowStock && (
           <div className="absolute top-2 left-2">
             <span className="px-2 py-0.5 bg-yellow-500 text-white text-xs font-medium rounded-full">
               Only {product.stock} left
@@ -136,7 +165,7 @@ export function ProductCard({
         )}
 
         {/* Quick add button (appears on hover) */}
-        {!isOutOfStock && onAddToCart && (
+        {canAddToCart && onAddToCart && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             whileHover={{ opacity: 1, y: 0 }}
@@ -146,7 +175,10 @@ export function ProductCard({
               size="icon"
               onClick={handleAddToCart}
               disabled={isAddingToCart}
-              className="h-10 w-10 rounded-full shadow-lg"
+              className={cn(
+                "h-10 w-10 rounded-full shadow-lg",
+                isService && "bg-purple-500 hover:bg-purple-600"
+              )}
             >
               {isAddingToCart ? (
                 <motion.div
@@ -165,7 +197,14 @@ export function ProductCard({
 
       {/* Product Info */}
       <div className="p-4">
-        <p className="text-xs text-muted-foreground mb-1">{product.category}</p>
+        <div className="flex items-center gap-2 mb-1">
+          {/* Type icon in info section */}
+          <TypeIcon className={cn(
+            "h-3 w-3",
+            isService ? "text-purple-500" : "text-muted-foreground"
+          )} />
+          <p className="text-xs text-muted-foreground">{product.category}</p>
+        </div>
         <motion.h3
           layoutId={enableLayoutAnimation ? `product-name-${product.id}` : undefined}
           className="font-medium line-clamp-2 mb-2"
@@ -176,20 +215,26 @@ export function ProductCard({
         <div className="flex items-center justify-between">
           <motion.span
             layoutId={enableLayoutAnimation ? `product-price-${product.id}` : undefined}
-            className="text-lg font-bold"
+            className={cn(
+              "text-lg font-bold",
+              isService && "text-purple-600 dark:text-purple-400"
+            )}
             transition={springConfig}
           >
             {formatCurrency(product.price)}
           </motion.span>
           
           {/* Mobile add button */}
-          {!isOutOfStock && onAddToCart && (
+          {canAddToCart && onAddToCart && (
             <Button
               size="sm"
               variant="outline"
               onClick={handleAddToCart}
               disabled={isAddingToCart}
-              className="md:hidden"
+              className={cn(
+                "md:hidden",
+                isService && "border-purple-500 text-purple-600 hover:bg-purple-50"
+              )}
             >
               <ShoppingCart className="h-4 w-4" />
             </Button>

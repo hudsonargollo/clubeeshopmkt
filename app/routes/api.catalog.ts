@@ -14,9 +14,12 @@ import { withCache, jsonWithCache } from "~/lib/cache.server";
 
 interface CatalogItem {
   id: string;
-  barcode: string;
+  type: 'physical' | 'service';
+  barcode: string | null;
   name: string;
+  description: string | null;
   category: string;
+  category_id: string | null;
   stock: number;
   price: number;
   image_url: string | null;
@@ -74,7 +77,7 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
       // Build query
       let query = supabase
         .from("inventory")
-        .select("id, barcode, name, category, stock, price, image_url", { count: "exact" })
+        .select("id, type, barcode, name, description, category, category_id, stock, price, image_url", { count: "exact" })
         .eq("tenant_id", tenantId)
         .order("category", { ascending: true })
         .order("name", { ascending: true })

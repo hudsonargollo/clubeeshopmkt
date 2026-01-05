@@ -1,4 +1,5 @@
 import { createRequestHandler, type ServerBuild } from "@remix-run/cloudflare";
+import type { AppLoadContext } from "@remix-run/cloudflare";
 import { getAssetFromKV } from "@cloudflare/kv-asset-handler";
 // @ts-ignore - this is generated at build time
 import * as build from "./build/server";
@@ -33,12 +34,13 @@ export default {
       }
 
       // Handle with Remix
+      // Cast to AppLoadContext - cf and caches are provided by Cloudflare Workers runtime
       const loadContext = {
         cloudflare: {
           env,
           ctx,
         },
-      };
+      } as unknown as AppLoadContext;
       return await handleRequest(request, loadContext);
     } catch (error) {
       console.error(error);

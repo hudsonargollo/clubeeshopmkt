@@ -336,7 +336,10 @@ export function useOptimisticList<T>(
 
       const { success } = await applyOptimistic(
         (current) => [...current, item],
-        serverAction
+        async () => {
+          await serverAction();
+          // Return void to match T[] | void expectation
+        }
       );
 
       setPendingItemIds((prev) => {
@@ -383,7 +386,10 @@ export function useOptimisticList<T>(
           current.map((item) =>
             getItemId(item) === itemId ? updateFn(item) : item
           ),
-        serverAction
+        async () => {
+          await serverAction();
+          // Return void to match T[] | void expectation
+        }
       );
 
       setPendingItemIds((prev) => {

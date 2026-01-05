@@ -8,8 +8,10 @@
   "scripts": {
     "dev": "remix vite:dev",
     "build": "remix vite:build",
-    "start": "wrangler pages dev ./build/client",
-    "deploy": "npm run build && wrangler pages deploy ./build/client",
+    "start": "wrangler dev",
+    "deploy": "npm run build && wrangler deploy",
+    "deploy:staging": "npm run build && wrangler deploy --env staging",
+    "deploy:production": "npm run build && wrangler deploy --env production",
     "typecheck": "tsc",
     "test": "vitest --run",
     "test:watch": "vitest"

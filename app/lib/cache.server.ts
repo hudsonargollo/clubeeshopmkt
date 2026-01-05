@@ -7,6 +7,13 @@
 
 import type { Env } from './supabase.server';
 
+// Cloudflare Workers Cache API type extension
+declare global {
+  interface CacheStorage {
+    default: Cache;
+  }
+}
+
 /**
  * Cache configuration
  */

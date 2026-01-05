@@ -25,12 +25,13 @@ export type {
   InventoryItem as RealtimeInventoryItem,
 } from './useRealtimeInventory';
 
-export { usePresence } from './usePresence';
-export type {
-  UsePresenceConfig,
-  UsePresenceReturn,
-  PresenceUser,
-} from './usePresence';
+// Note: usePresence temporarily disabled due to build issues
+// export { usePresence } from './usePresence';
+// export type {
+//   UsePresenceConfig,
+//   UsePresenceReturn,
+//   PresenceUser,
+// } from './usePresence';
 
 export { useOptimisticState, useOptimisticList } from './useOptimisticState';
 export type {

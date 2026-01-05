@@ -4,8 +4,11 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
 } from "@remix-run/react";
-import type { LinksFunction, MetaFunction } from "@remix-run/cloudflare";
+import type { LinksFunction, LoaderFunctionArgs, MetaFunction } from "@remix-run/cloudflare";
+import { json } from "@remix-run/cloudflare";
+import type { Env } from "~/lib/supabase.server";
 
 import "./styles/tailwind.css";
 
@@ -41,7 +44,30 @@ export const links: LinksFunction = () => [
   { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
 ];
 
+/**
+ * Loader to expose public environment variables to the client
+ * Required for client-side Supabase authentication
+ */
+export async function loader({ context }: LoaderFunctionArgs) {
+  const env = context.cloudflare.env as Env;
+  
+  return json({
+    ENV: {
+      SUPABASE_URL: env.SUPABASE_URL,
+      SUPABASE_ANON_KEY: env.SUPABASE_ANON_KEY,
+    },
+  });
+}
+
 export function Layout({ children }: { children: React.ReactNode }) {
+  // Get loader data if available (won't be available during error boundaries)
+  let data: { ENV?: { SUPABASE_URL: string; SUPABASE_ANON_KEY: string } } | undefined;
+  try {
+    data = useLoaderData<typeof loader>();
+  } catch {
+    // Loader data not available (e.g., during error boundary)
+  }
+
   return (
     <html lang="en" className="h-full">
       <head>
@@ -53,6 +79,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <body className="h-full bg-background text-foreground antialiased">
         {children}
         <ScrollRestoration />
+        {data?.ENV && (
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `window.ENV = ${JSON.stringify(data.ENV)}`,
+            }}
+          />
+        )}
         <Scripts />
       </body>
     </html>
