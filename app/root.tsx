@@ -49,12 +49,16 @@ export const links: LinksFunction = () => [
  * Required for client-side Supabase authentication
  */
 export async function loader({ context }: LoaderFunctionArgs) {
-  const env = context.cloudflare.env as Env;
+  const env = context.cloudflare?.env as Env | undefined;
+  
+  // Handle missing env gracefully - page will still render
+  const supabaseUrl = env?.SUPABASE_URL || '';
+  const supabaseAnonKey = env?.SUPABASE_ANON_KEY || '';
   
   return json({
     ENV: {
-      SUPABASE_URL: env.SUPABASE_URL,
-      SUPABASE_ANON_KEY: env.SUPABASE_ANON_KEY,
+      SUPABASE_URL: supabaseUrl,
+      SUPABASE_ANON_KEY: supabaseAnonKey,
     },
   });
 }
