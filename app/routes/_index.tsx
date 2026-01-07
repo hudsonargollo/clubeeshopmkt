@@ -4,7 +4,6 @@
  * Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 12.1, 13.1, 13.2, 13.3, 13.4
  */
 
-import { useState } from 'react';
 import type { MetaFunction } from '@remix-run/cloudflare';
 import { Link } from '@remix-run/react';
 import { motion } from 'framer-motion';
@@ -26,12 +25,6 @@ export const meta: MetaFunction = () => {
  * Hero Section Component
  */
 function HeroSection() {
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleGetStarted = () => {
-    window.location.href = '/signup';
-  };
-
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center px-4 py-20 overflow-hidden">
       {/* Gradient background */}
@@ -68,17 +61,15 @@ function HeroSection() {
 
         {/* CTAs */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button
-            size="lg"
-            onClick={handleGetStarted}
-            disabled={isLoading}
-            className="h-12 px-8 text-base bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all duration-300"
-          >
-            <>
+          <Link to="/signup">
+            <Button
+              size="lg"
+              className="h-12 px-8 text-base bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all duration-300 w-full"
+            >
               Start for Free
               <ArrowRight className="h-5 w-5 ml-2" />
-            </>
-          </Button>
+            </Button>
+          </Link>
           
           <Link to="/login">
             <Button
@@ -248,12 +239,6 @@ function BenefitsSection() {
  * CTA Section
  */
 function CTASection() {
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleGetStarted = () => {
-    window.location.href = '/signup';
-  };
-
   return (
     <section className="relative px-4 py-24">
       <div className="max-w-3xl mx-auto text-center space-y-6">
@@ -264,15 +249,15 @@ function CTASection() {
           Join thousands of businesses already using ClubeeShopMkt to manage their retail operations.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-          <Button
-            size="lg"
-            onClick={handleGetStarted}
-            disabled={isLoading}
-            className="h-12 px-8 text-base bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg"
-          >
-            <CheckCircle2 className="h-5 w-5 mr-2" />
-            Get Started Free
-          </Button>
+          <Link to="/signup">
+            <Button
+              size="lg"
+              className="h-12 px-8 text-base bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg w-full"
+            >
+              <CheckCircle2 className="h-5 w-5 mr-2" />
+              Get Started Free
+            </Button>
+          </Link>
         </div>
       </div>
     </section>
