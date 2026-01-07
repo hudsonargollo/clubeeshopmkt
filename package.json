@@ -12,9 +12,14 @@
     "deploy": "npm run build && wrangler deploy",
     "deploy:staging": "npm run build && wrangler deploy --env staging",
     "deploy:production": "npm run build && wrangler deploy --env production",
+    "deploy:quick": "npm run build && wrangler deploy",
+    "deploy:full": "node -e \"console.log('Use deployment scripts in ./scripts/ directory')\"",
     "typecheck": "tsc",
     "test": "vitest --run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "logs": "wrangler tail",
+    "secrets:list": "wrangler secret list",
+    "rollback": "wrangler rollback"
   },
   "repository": {
     "type": "git",
