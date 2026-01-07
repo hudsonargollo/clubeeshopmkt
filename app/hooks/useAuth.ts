@@ -6,21 +6,23 @@
 import { useState, useEffect, useCallback } from 'react';
 
 interface AuthState {
-  isAuthenticated: boolean;
+  isAuthenticated: boolean | undefined; // undefined = not yet checked
   isLoading: boolean;
   accessToken: string | null;
 }
 
 export function useAuth() {
   const [state, setState] = useState<AuthState>({
-    isAuthenticated: false,
+    isAuthenticated: undefined, // Start as undefined to indicate "not yet checked"
     isLoading: true,
     accessToken: null,
   });
 
   useEffect(() => {
     // Check for stored tokens on mount
+    console.log('useAuth: checking localStorage for tokens');
     const accessToken = localStorage.getItem('sb-access-token');
+    console.log('useAuth: accessToken found:', !!accessToken);
     setState({
       isAuthenticated: !!accessToken,
       isLoading: false,

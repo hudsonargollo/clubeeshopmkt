@@ -21,12 +21,13 @@ import { cn } from '~/lib/utils';
 
 export interface InventoryItem {
   id: string;
-  barcode: string;
+  barcode: string | null;
   name: string;
   category: string;
   stock: number;
   price: number;
   image_url: string | null;
+  type?: 'physical' | 'service';
 }
 
 export interface InventoryEditDrawerProps {
@@ -94,8 +95,8 @@ export function InventoryEditDrawer({
     if (!formData.name.trim()) {
       newErrors.name = 'Name is required';
     }
-    if (!formData.barcode.trim()) {
-      newErrors.barcode = 'Barcode is required';
+    if (formData.type === 'physical' && !formData.barcode?.trim()) {
+      newErrors.barcode = 'Barcode is required for physical products';
     }
     if (formData.price < 0) {
       newErrors.price = 'Price cannot be negative';
@@ -227,7 +228,7 @@ export function InventoryEditDrawer({
           <div className="space-y-2">
             <label className="text-sm font-medium">Barcode</label>
             <Input
-              value={formData.barcode}
+              value={formData.barcode || ''}
               disabled
               className="bg-muted"
             />

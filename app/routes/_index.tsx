@@ -10,7 +10,7 @@ import { Link } from '@remix-run/react';
 import { motion } from 'framer-motion';
 import { 
   Package, Building2, CreditCard, Wrench, FolderTree, RefreshCw,
-  Loader2, ArrowRight, Store, Scan, ShoppingCart, Zap, Shield, Globe, CheckCircle2
+  ArrowRight, Store, Scan, ShoppingCart, Zap, Shield, Globe, CheckCircle2
 } from 'lucide-react';
 import { Button } from '~/components/ui/button';
 import { ClientOnly } from '~/components/ui/ClientOnly';
@@ -28,15 +28,8 @@ export const meta: MetaFunction = () => {
 function HeroSection() {
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleGetStarted = async () => {
-    setIsLoading(true);
-    try {
-      const { signInWithGoogle } = await import('~/lib/auth');
-      await signInWithGoogle();
-    } catch (error) {
-      console.error('Sign-in error:', error);
-      setIsLoading(false);
-    }
+  const handleGetStarted = () => {
+    window.location.href = '/signup';
   };
 
   return (
@@ -81,17 +74,10 @@ function HeroSection() {
             disabled={isLoading}
             className="h-12 px-8 text-base bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all duration-300"
           >
-            {isLoading ? (
-              <>
-                <Loader2 className="h-5 w-5 animate-spin mr-2" />
-                Connecting...
-              </>
-            ) : (
-              <>
-                Start for Free
-                <ArrowRight className="h-5 w-5 ml-2" />
-              </>
-            )}
+            <>
+              Start for Free
+              <ArrowRight className="h-5 w-5 ml-2" />
+            </>
           </Button>
           
           <Link to="/login">
@@ -264,15 +250,8 @@ function BenefitsSection() {
 function CTASection() {
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleGetStarted = async () => {
-    setIsLoading(true);
-    try {
-      const { signInWithGoogle } = await import('~/lib/auth');
-      await signInWithGoogle();
-    } catch (error) {
-      console.error('Sign-in error:', error);
-      setIsLoading(false);
-    }
+  const handleGetStarted = () => {
+    window.location.href = '/signup';
   };
 
   return (
@@ -291,7 +270,7 @@ function CTASection() {
             disabled={isLoading}
             className="h-12 px-8 text-base bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg"
           >
-            {isLoading ? <Loader2 className="h-5 w-5 animate-spin mr-2" /> : <CheckCircle2 className="h-5 w-5 mr-2" />}
+            <CheckCircle2 className="h-5 w-5 mr-2" />
             Get Started Free
           </Button>
         </div>

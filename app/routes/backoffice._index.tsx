@@ -48,7 +48,6 @@ export async function loader({ request, context }: LoaderFunctionArgs): Promise<
       orders: [],
       tenantId: null,
       authenticated: false,
-      error: 'Please log in to access the backoffice',
     });
   }
 
@@ -70,8 +69,9 @@ export async function loader({ request, context }: LoaderFunctionArgs): Promise<
 
   // Get tenant_id from user metadata or user_tenants table
   let tenantId = user.app_metadata?.tenant_id as string | undefined;
+  const isSuperAdmin = user.email === 'cavernacentral2@gmail.com';
   
-  if (!tenantId) {
+  if (!tenantId && !isSuperAdmin) {
     // Try to get tenant from user_tenants table
     const { data: userTenant } = await supabase
       .from('user_tenants')
@@ -82,7 +82,23 @@ export async function loader({ request, context }: LoaderFunctionArgs): Promise<
     tenantId = userTenant?.tenant_id;
   }
 
-  if (!tenantId) {
+  // For superadmin, we can either:
+  // 1. Show all tenants' data (requires UI changes)
+  // 2. Default to a specific tenant
+  // 3. Redirect to portal for tenant selection
+  // For now, let's redirect superadmin to portal if no specific tenant is selected
+  if (isSuperAdmin && !tenantId) {
+    // Could add ?tenant=xxx query param support later
+    return json<LoaderData>({
+      products: [],
+      orders: [],
+      tenantId: null,
+      authenticated: true,
+      error: 'Superadmin should use portal to select tenant',
+    });
+  }
+
+  if (!tenantId && !isSuperAdmin) {
     return json<LoaderData>({
       products: [],
       orders: [],
@@ -180,20 +196,33 @@ export default function BackofficeDashboard() {
 
   // Fetch data with auth token on client side
   useEffect(() => {
+    // Only refetch if:
+    // 1. Auth loading is complete
+    // 2. Client says we're authenticated (have token)
+    // 3. Server didn't get the auth (authenticated is false)
     if (!authLoading && isAuthenticated && !authenticated) {
+      console.log('Backoffice: refetching data with auth header');
       // We have a token but server didn't get it - refetch with auth header
       setIsLoadingData(true);
       authFetch('/backoffice?_data=routes%2Fbackoffice._index')
         .then(res => res.json() as Promise<LoaderData>)
         .then((data) => {
+          console.log('Backoffice: refetch response', data);
           if (data.products) {
             setProducts(data.products);
           }
+          // If still not authenticated after refetch, redirect to login
+          if (!data.authenticated) {
+            console.log('Backoffice: still not authenticated after refetch, redirecting to login');
+            navigate('/login');
+          }
         })
-        .catch(console.error)
+        .catch((err) => {
+          console.error('Backoffice: refetch error', err);
+        })
         .finally(() => setIsLoadingData(false));
     }
-  }, [authLoading, isAuthenticated, authenticated]);
+  }, [authLoading, isAuthenticated, authenticated, navigate]);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -272,8 +301,21 @@ export default function BackofficeDashboard() {
     }
   }, [revalidator]);
 
-  // Show loading state while checking auth
-  if (authLoading || isLoadingData) {
+  const [isMounted, setIsMounted] = useState(false);
+  
+  // Track when component is mounted on client
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Debug: log auth state
+  useEffect(() => {
+    console.log('Backoffice: authLoading=', authLoading, 'isAuthenticated=', isAuthenticated, 'authenticated=', authenticated, 'isMounted=', isMounted);
+  }, [authLoading, isAuthenticated, authenticated, isMounted]);
+
+  // Show loading state while checking auth (only after client mount)
+  // Also show loading if server says not authenticated but we're still checking client-side auth
+  if (isMounted && (authLoading || isLoadingData || (!authenticated && isAuthenticated === undefined))) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -284,8 +326,12 @@ export default function BackofficeDashboard() {
     );
   }
 
-  // Not authenticated - show login prompt
-  if (!authenticated) {
+  // Not authenticated - show login prompt only if:
+  // 1. Server says not authenticated AND
+  // 2. Client-side auth check is complete AND client says not authenticated
+  const showLoginPrompt = !authenticated && isMounted && !authLoading && !isAuthenticated;
+  
+  if (showLoginPrompt) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="text-center max-w-md">
@@ -298,6 +344,18 @@ export default function BackofficeDashboard() {
           >
             Go to Login
           </a>
+        </div>
+      </div>
+    );
+  }
+  
+  // Still loading - show spinner while client-side auth refetches data
+  if (!authenticated && isAuthenticated && isLoadingData) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
+          <p className="text-muted-foreground">Loading your data...</p>
         </div>
       </div>
     );

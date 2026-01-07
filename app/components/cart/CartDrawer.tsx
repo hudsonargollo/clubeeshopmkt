@@ -24,7 +24,7 @@ import { cn } from '~/lib/utils';
 export interface CartItem {
   id: string;
   inventoryId: string;
-  barcode: string;
+  barcode: string | null;
   name: string;
   price: number;
   quantity: number;
