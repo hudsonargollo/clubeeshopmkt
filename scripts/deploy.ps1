@@ -137,7 +137,8 @@ Write-Host "  • Git: $(if ($SkipGit) { 'Skipped' } else { 'Completed' })" -For
 Write-Host "  • Cloudflare: Deployed" -ForegroundColor White
 Write-Host "  • Cache: Purged" -ForegroundColor White
 Write-Host ""
-Write-Host "🌐 Production URL: https://clubeeshopmkt.hudsonargollo2.workers.dev" -ForegroundColor Cyan
-Write-Host "📱 Test the signup page: https://clubeeshopmkt.hudsonargollo2.workers.dev/signup" -ForegroundColor Cyan
+Write-Host "🌐 Custom Domain: https://eshop.clubemkt.digital" -ForegroundColor Cyan
+Write-Host "🌐 Workers URL: https://clubeeshopmkt.hudsonargollo2.workers.dev" -ForegroundColor Cyan
+Write-Host "📱 Test the signup page: https://eshop.clubemkt.digital/signup" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "✨ Ready for testing!" -ForegroundColor Green
