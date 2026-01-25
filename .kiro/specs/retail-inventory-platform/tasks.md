@@ -36,7 +36,7 @@ This implementation plan breaks down the retail platform into incremental coding
     - Ensure policies use auth.jwt() -> 'app_metadata' ->> 'tenant_id'
     - _Requirements: 1.2, 1.4_
 
-  - [ ]* 2.3 Write property test for tenant isolation
+  - [x]* 2.3 Write property test for tenant isolation
     - **Property 1: Tenant Isolation Invariant**
     - Generate random tenant pairs and verify cross-tenant queries return empty
     - **Validates: Requirements 1.2, 1.4**
@@ -83,13 +83,13 @@ This implementation plan breaks down the retail platform into incremental coding
     - Implement barcode pattern validation
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6_
 
-  - [ ]* 5.2 Write property test for scanner velocity discrimination
+  - [x]* 5.2 Write property test for scanner velocity discrimination
     - **Property 2: Scanner Velocity Discrimination**
     - Generate keystroke sequences with controlled timing
     - Verify fast sequences (<50ms) emit onScan, slow sequences clear buffer
     - **Validates: Requirements 2.2, 2.3, 2.4**
 
-  - [ ]* 5.3 Write property test for scanner input passthrough
+  - [x]* 5.3 Write property test for scanner input passthrough
     - **Property 3: Scanner Input Passthrough**
     - Generate keystrokes while focus is on input elements
     - Verify buffer does not accumulate
@@ -121,7 +121,7 @@ This implementation plan breaks down the retail platform into incremental coding
     - Ensure atomic check-and-update with stock >= quantity constraint
     - _Requirements: 5.1, 5.2, 5.3, 5.4_
 
-  - [ ]* 6.2 Write property test for stock non-negativity
+  - [x]* 6.2 Write property test for stock non-negativity
     - **Property 5: Stock Non-Negativity Invariant**
     - Generate concurrent decrement operations
     - Verify stock never goes negative
@@ -184,7 +184,7 @@ This implementation plan breaks down the retail platform into incremental coding
     - Implement transition validation function
     - _Requirements: 14.5_
 
-  - [ ]* 9.2 Write property test for order state machine validity
+  - [x]* 9.2 Write property test for order state machine validity
     - **Property 10: Order State Machine Validity**
     - Generate random transition sequences
     - Verify only valid transitions succeed
@@ -198,7 +198,7 @@ This implementation plan breaks down the retail platform into incremental coding
     - Navigate to Order Detail drawer on scan
     - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5_
 
-  - [ ]* 9.4 Write property test for QR code round trip
+  - [x]* 9.4 Write property test for QR code round trip
     - **Property 13: QR Code Round Trip**
     - Generate random order IDs
     - Verify QR encode → scan → decode returns same ID
