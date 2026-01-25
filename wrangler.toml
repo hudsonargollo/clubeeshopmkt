@@ -6,12 +6,10 @@ compatibility_flags = ["nodejs_compat"]
 # Main entry point
 main = "worker.ts"
 
-# Custom domain configuration
+# Custom domain will be configured via Cloudflare Dashboard
 # Domain: eshop.clubemkt.digital
-# Note: Domain must be added to Cloudflare zone and configured via dashboard
-routes = [
-  { pattern = "eshop.clubemkt.digital/*", custom_domain = true }
-]
+# Note: Custom domains must be added through the Cloudflare Workers dashboard
+# or via wrangler domains command, not in routes configuration
 
 # Assets directory for static files
 [site]
