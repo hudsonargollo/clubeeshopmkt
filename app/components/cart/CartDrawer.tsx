@@ -90,7 +90,7 @@ export function CartDrawer({
         <DrawerHeader>
           <DrawerTitle className="flex items-center gap-2">
             <ShoppingBag className="h-5 w-5" />
-            Shopping Cart
+            Carrinho de Compras
             {itemCount > 0 && (
               <span className="px-2 py-0.5 text-xs bg-primary text-primary-foreground rounded-full">
                 {itemCount}
@@ -99,8 +99,8 @@ export function CartDrawer({
           </DrawerTitle>
           <DrawerDescription>
             {items.length === 0
-              ? 'Your cart is empty'
-              : `${items.length} item${items.length !== 1 ? 's' : ''} in cart`}
+              ? 'Seu carrinho está vazio'
+              : `${items.length} ${items.length !== 1 ? 'itens' : 'item'} no carrinho`}
           </DrawerDescription>
         </DrawerHeader>
 
@@ -109,8 +109,8 @@ export function CartDrawer({
           {items.length === 0 && (
             <div className="py-12 text-center text-muted-foreground">
               <ShoppingBag className="h-12 w-12 mx-auto mb-4 opacity-30" />
-              <p>No items in your cart</p>
-              <p className="text-sm mt-1">Scan products to add them</p>
+              <p>Nenhum item no seu carrinho</p>
+              <p className="text-sm mt-1">Escaneie produtos para adicioná-los</p>
             </div>
           )}
 
@@ -143,7 +143,7 @@ export function CartDrawer({
                 <div className="flex-1 min-w-0">
                   <p className="font-medium truncate">{item.name}</p>
                   <p className="text-sm text-muted-foreground">
-                    {formatCurrency(item.price)} each
+                    {formatCurrency(item.price)} cada
                   </p>
                 </div>
 
@@ -206,7 +206,7 @@ export function CartDrawer({
                   disabled={isCheckingOut}
                   className="text-destructive hover:text-destructive"
                 >
-                  Clear Cart
+                  Limpar Carrinho
                 </Button>
               )}
               
@@ -214,7 +214,7 @@ export function CartDrawer({
               
               <DrawerClose asChild>
                 <Button variant="outline" disabled={isCheckingOut}>
-                  Continue Shopping
+                  Continuar Comprando
                 </Button>
               </DrawerClose>
               
@@ -223,7 +223,7 @@ export function CartDrawer({
                 disabled={isCheckingOut || items.length === 0}
                 className="min-w-[120px]"
               >
-                {isCheckingOut ? 'Processing...' : 'Checkout'}
+                {isCheckingOut ? 'Processando...' : 'Finalizar Compra'}
               </Button>
             </div>
           </DrawerFooter>
@@ -234,7 +234,7 @@ export function CartDrawer({
           <DrawerFooter>
             <DrawerClose asChild>
               <Button variant="outline" className="w-full">
-                Start Shopping
+                Começar a Comprar
               </Button>
             </DrawerClose>
           </DrawerFooter>

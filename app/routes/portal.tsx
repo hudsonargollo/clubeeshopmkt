@@ -15,8 +15,8 @@ import { Store, ChevronRight, Loader2, Building2 } from 'lucide-react';
 
 export const meta: MetaFunction = () => {
   return [
-    { title: 'Select Shop - ClubeeShopMkt' },
-    { name: 'description', content: 'Choose which shop to manage' },
+    { title: 'Selecionar Loja - ClubeeShopMkt' },
+    { name: 'description', content: 'Escolha qual loja gerenciar' },
   ];
 };
 
@@ -101,7 +101,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
   const tenantId = formData.get('tenantId') as string;
 
   if (!tenantId) {
-    return json({ error: 'No shop selected' }, { status: 400 });
+    return json({ error: 'Nenhuma loja selecionada' }, { status: 400 });
   }
 
   const authHeader = request.headers.get('Authorization');
@@ -123,7 +123,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
     .single();
 
   if (accessError || !userTenant) {
-    return json({ error: 'You do not have access to this shop' }, { status: 403 });
+    return json({ error: 'Você não tem acesso a esta loja' }, { status: 403 });
   }
 
   // Update user's app_metadata with selected tenant_id
@@ -190,9 +190,9 @@ export default function PortalPage() {
             >
               <Building2 className="h-8 w-8 text-white" />
             </motion.div>
-            <CardTitle className="text-2xl">Select a Shop</CardTitle>
+            <CardTitle className="text-2xl">Selecione uma Loja</CardTitle>
             <CardDescription>
-              {userEmail && <span>Signed in as {userEmail}</span>}
+              {userEmail && <span>Conectado como {userEmail}</span>}
             </CardDescription>
           </CardHeader>
 
@@ -226,7 +226,9 @@ export default function PortalPage() {
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="text-xs px-2 py-1 rounded-full bg-secondary text-secondary-foreground capitalize">
-                          {shop.role}
+                          {shop.role === 'owner' ? 'Proprietário' : 
+                           shop.role === 'staff' ? 'Funcionário' : 
+                           shop.role}
                         </span>
                         {isSelecting && fetcher.formData?.get('tenantId') === shop.tenant_id ? (
                           <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
@@ -252,7 +254,7 @@ export default function PortalPage() {
                 className="flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 <Store className="h-4 w-4" />
-                Create a new shop
+                Criar uma nova loja
               </a>
             </motion.div>
           </CardContent>
@@ -266,7 +268,7 @@ export default function PortalPage() {
           className="text-center text-sm text-muted-foreground mt-4"
         >
           <a href="/login" className="hover:underline">
-            Sign out
+            Sair
           </a>
         </motion.p>
       </motion.div>

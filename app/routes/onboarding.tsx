@@ -17,8 +17,8 @@ import { Store, Loader2, AlertCircle, CheckCircle, Globe } from 'lucide-react';
 
 export const meta: MetaFunction = () => {
   return [
-    { title: 'Create Your Shop - ClubeeShopMkt' },
-    { name: 'description', content: 'Set up your shop in seconds' },
+    { title: 'Crie Sua Loja - ClubeeShopMkt' },
+    { name: 'description', content: 'Configure sua loja em segundos' },
   ];
 };
 
@@ -62,19 +62,19 @@ export async function action({ request, context }: ActionFunctionArgs) {
   const fieldErrors: ActionData['fieldErrors'] = {};
   
   if (!shopName || shopName.length < 2) {
-    fieldErrors.shopName = 'Shop name must be at least 2 characters';
+    fieldErrors.shopName = 'O nome da loja deve ter pelo menos 2 caracteres';
   } else if (shopName.length > 50) {
-    fieldErrors.shopName = 'Shop name must be less than 50 characters';
+    fieldErrors.shopName = 'O nome da loja deve ter menos de 50 caracteres';
   }
 
   if (!subdomain || subdomain.length < 3) {
-    fieldErrors.subdomain = 'Subdomain must be at least 3 characters';
+    fieldErrors.subdomain = 'O subdomínio deve ter pelo menos 3 caracteres';
   } else if (subdomain.length > 30) {
-    fieldErrors.subdomain = 'Subdomain must be less than 30 characters';
+    fieldErrors.subdomain = 'O subdomínio deve ter menos de 30 caracteres';
   } else if (!/^[a-z0-9-]+$/.test(subdomain)) {
-    fieldErrors.subdomain = 'Only lowercase letters, numbers, and hyphens allowed';
+    fieldErrors.subdomain = 'Apenas letras minúsculas, números e hífens são permitidos';
   } else if (subdomain.startsWith('-') || subdomain.endsWith('-')) {
-    fieldErrors.subdomain = 'Subdomain cannot start or end with a hyphen';
+    fieldErrors.subdomain = 'O subdomínio não pode começar ou terminar com hífen';
   }
 
   if (Object.keys(fieldErrors).length > 0) {
@@ -89,7 +89,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   
   if (userError || !user) {
-    return json<ActionData>({ error: 'Please sign in to continue' }, { status: 401 });
+    return json<ActionData>({ error: 'Faça login para continuar' }, { status: 401 });
   }
 
   // Check subdomain uniqueness
@@ -101,7 +101,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
 
   if (existingTenant) {
     return json<ActionData>({
-      fieldErrors: { subdomain: 'This subdomain is already taken' },
+      fieldErrors: { subdomain: 'Este subdomínio já está em uso' },
     }, { status: 409 });
   }
 
@@ -118,7 +118,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
 
   if (tenantError || !tenant) {
     console.error('Tenant creation error:', tenantError);
-    return json<ActionData>({ error: 'Failed to create shop. Please try again.' }, { status: 500 });
+    return json<ActionData>({ error: 'Falha ao criar loja. Tente novamente.' }, { status: 500 });
   }
 
   // Create user_tenant record with 'owner' role
@@ -134,7 +134,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
     console.error('User tenant creation error:', userTenantError);
     // Rollback tenant creation
     await supabase.from('tenants').delete().eq('id', tenant.id);
-    return json<ActionData>({ error: 'Failed to set up shop ownership. Please try again.' }, { status: 500 });
+    return json<ActionData>({ error: 'Falha ao configurar propriedade da loja. Tente novamente.' }, { status: 500 });
   }
 
   // Refresh the user's JWT to include the new tenant_id
@@ -236,9 +236,9 @@ export default function OnboardingPage() {
             >
               <Store className="h-8 w-8 text-white" />
             </motion.div>
-            <CardTitle className="text-2xl">Create Your Shop</CardTitle>
+            <CardTitle className="text-2xl">Crie Sua Loja</CardTitle>
             <CardDescription>
-              Set up your online store in seconds
+              Configure sua loja online em segundos
             </CardDescription>
           </CardHeader>
 
@@ -265,7 +265,7 @@ export default function OnboardingPage() {
                 transition={{ delay: 0.3 }}
               >
                 <label htmlFor="shopName" className="block text-sm font-medium mb-2">
-                  Shop Name
+                  Nome da Loja
                 </label>
                 <Input
                   id="shopName"
@@ -273,7 +273,7 @@ export default function OnboardingPage() {
                   type="text"
                   value={shopName}
                   onChange={(e) => setShopName(e.target.value)}
-                  placeholder="My Awesome Shop"
+                  placeholder="Minha Loja Incrível"
                   required
                   minLength={2}
                   maxLength={50}
@@ -294,7 +294,7 @@ export default function OnboardingPage() {
                 transition={{ delay: 0.4 }}
               >
                 <label htmlFor="subdomain" className="block text-sm font-medium mb-2">
-                  Subdomain
+                  Subdomínio
                 </label>
                 <div className="relative">
                   <Input
@@ -303,7 +303,7 @@ export default function OnboardingPage() {
                     type="text"
                     value={subdomain}
                     onChange={handleSubdomainChange}
-                    placeholder="myshop"
+                    placeholder="minhaloja"
                     required
                     minLength={3}
                     maxLength={30}
@@ -330,7 +330,7 @@ export default function OnboardingPage() {
                 >
                   <Globe className="h-3.5 w-3.5" />
                   <span>
-                    {subdomain || 'yourshop'}.{baseDomain}
+                    {subdomain || 'sualoja'}.{baseDomain}
                   </span>
                 </div>
 
@@ -342,7 +342,7 @@ export default function OnboardingPage() {
                 )}
                 {!isCheckingSubdomain && subdomainAvailable === false && !actionData?.fieldErrors?.subdomain && (
                   <p className="text-sm text-destructive mt-1">
-                    This subdomain is already taken
+                    Este subdomínio já está em uso
                   </p>
                 )}
               </motion.div>
@@ -365,10 +365,10 @@ export default function OnboardingPage() {
                     {isSubmitting ? (
                       <>
                         <Loader2 className="h-4 w-4 animate-spin" />
-                        Creating your shop...
+                        Criando sua loja...
                       </>
                     ) : (
-                      'Create Shop'
+                      'Criar Loja'
                     )}
                   </motion.span>
                 </Button>
@@ -384,7 +384,7 @@ export default function OnboardingPage() {
           transition={{ delay: 0.6 }}
           className="text-center text-sm text-muted-foreground mt-4"
         >
-          Step 1 of 1 • You'll be ready to go in seconds
+          Passo 1 de 1 • Você estará pronto em segundos
         </motion.p>
       </motion.div>
     </div>

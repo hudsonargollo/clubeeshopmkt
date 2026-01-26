@@ -19,8 +19,8 @@ import { Plus, ShoppingBag } from 'lucide-react';
 
 export const meta: MetaFunction = () => {
   return [
-    { title: 'Orders - ClubeeShopMkt Backoffice' },
-    { name: 'description', content: 'Manage your orders' },
+    { title: 'Pedidos - ClubeeShopMkt Backoffice' },
+    { name: 'description', content: 'Gerencie seus pedidos' },
   ];
 };
 
@@ -169,13 +169,13 @@ export default function OrdersListPage() {
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="text-center max-w-md">
           <ShoppingBag className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-          <h1 className="text-xl font-semibold mb-2">Login Required</h1>
+          <h1 className="text-xl font-semibold mb-2">Login Necessário</h1>
           <p className="text-muted-foreground mb-4">{error}</p>
           <Link
             to="/login"
             className="inline-flex items-center justify-center px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"
           >
-            Go to Login
+            Ir para Login
           </Link>
         </div>
       </div>
@@ -187,7 +187,7 @@ export default function OrdersListPage() {
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="text-center max-w-md">
           <ShoppingBag className="h-12 w-12 mx-auto mb-4 text-destructive" />
-          <h1 className="text-xl font-semibold mb-2">Error</h1>
+          <h1 className="text-xl font-semibold mb-2">Erro</h1>
           <p className="text-muted-foreground">{error}</p>
         </div>
       </div>
@@ -201,15 +201,15 @@ export default function OrdersListPage() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl font-bold">Orders</h1>
+              <h1 className="text-xl font-bold">Pedidos</h1>
               <p className="text-sm text-muted-foreground">
-                {total} total • {activeCount} active
+                {total} total • {activeCount} ativos
               </p>
             </div>
             <Link to="/backoffice/orders/new">
               <Button>
                 <Plus className="h-4 w-4 mr-2" />
-                New Order
+                Novo Pedido
               </Button>
             </Link>
           </div>

@@ -18,10 +18,10 @@ import type { ProductCardItem } from '~/components/inventory/ProductCard';
 import { ShoppingBag, AlertCircle } from 'lucide-react';
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
-  const tenantName = data?.tenant?.name || 'Shop';
+  const tenantName = data?.tenant?.name || 'Loja';
   return [
     { title: `${tenantName} - ClubeeShopMkt` },
-    { name: 'description', content: `Browse and order products from ${tenantName}` },
+    { name: 'description', content: `Navegue e peça produtos de ${tenantName}` },
   ];
 };
 
@@ -45,7 +45,7 @@ export async function loader({ request, context }: LoaderFunctionArgs): Promise<
       products: [],
       categories: [],
       tenant: null,
-      error: 'No tenant found. Access via subdomain (e.g., demo.yoursite.com) or create a tenant.',
+      error: 'Nenhum tenant encontrado. Acesse via subdomínio (ex: demo.seusite.com) ou crie um tenant.',
     });
   }
 
@@ -65,7 +65,7 @@ export async function loader({ request, context }: LoaderFunctionArgs): Promise<
       products: [],
       categories: [],
       tenant: { id: tenant.id, name: tenant.name, subdomain: tenant.subdomain },
-      error: 'Failed to load products',
+      error: 'Falha ao carregar produtos',
     });
   }
 
@@ -156,7 +156,7 @@ export default function ShopPage() {
   const handleCheckout = useCallback(() => {
     // TODO: Implement checkout flow
     console.log('Checkout:', cart);
-    alert('Checkout functionality coming soon!');
+    alert('Funcionalidade de checkout em breve!');
   }, [cart]);
 
   // Calculate cart count for dock badge
@@ -169,7 +169,7 @@ export default function ShopPage() {
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="text-center max-w-md">
           <AlertCircle className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-          <h1 className="text-xl font-semibold mb-2">Shop Not Found</h1>
+          <h1 className="text-xl font-semibold mb-2">Loja Não Encontrada</h1>
           <p className="text-muted-foreground">{error}</p>
         </div>
       </div>
@@ -183,13 +183,13 @@ export default function ShopPage() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold">{tenant?.name || 'Shop'}</h1>
-              <p className="text-sm text-muted-foreground">Fresh products delivered</p>
+              <h1 className="text-2xl font-bold">{tenant?.name || 'Loja'}</h1>
+              <p className="text-sm text-muted-foreground">Produtos frescos entregues</p>
             </div>
             <button
               onClick={() => setIsCartOpen(true)}
               className="relative p-2 rounded-full hover:bg-muted transition-colors"
-              aria-label={`Cart with ${cartCount} items`}
+              aria-label={`Carrinho com ${cartCount} itens`}
             >
               <ShoppingBag className="h-6 w-6" />
               {cartCount > 0 && (
@@ -205,7 +205,7 @@ export default function ShopPage() {
             onClick={() => setSearchOpen(true)}
             className="w-full mt-3 px-4 py-2.5 text-left text-muted-foreground bg-muted rounded-lg hover:bg-muted/80 transition-colors"
           >
-            Search products... (⌘K)
+            Buscar produtos... (⌘K)
           </button>
         </div>
       </header>
@@ -219,7 +219,7 @@ export default function ShopPage() {
               !selectedCategory ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'
             }`}
           >
-            All
+            Todos
           </button>
           {categories.map((category) => (
             <button
@@ -240,7 +240,7 @@ export default function ShopPage() {
         {filteredProducts.length === 0 ? (
           <div className="py-12 text-center text-muted-foreground">
             <ShoppingBag className="h-12 w-12 mx-auto mb-4 opacity-30" />
-            <p>No products available</p>
+            <p>Nenhum produto disponível</p>
           </div>
         ) : (
           <ProductGrid

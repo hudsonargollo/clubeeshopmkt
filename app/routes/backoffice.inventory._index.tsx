@@ -28,8 +28,8 @@ import { cn } from '~/lib/utils';
 
 export const meta: MetaFunction = () => {
   return [
-    { title: 'Inventory - ClubeeShopMkt Backoffice' },
-    { name: 'description', content: 'Manage your product and service catalog' },
+    { title: 'Estoque - ClubeeShopMkt Backoffice' },
+    { name: 'description', content: 'Gerencie seu catálogo de produtos e serviços' },
   ];
 };
 
@@ -182,13 +182,13 @@ export default function InventoryListPage() {
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="text-center max-w-md">
           <Package className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-          <h1 className="text-xl font-semibold mb-2">Login Required</h1>
+          <h1 className="text-xl font-semibold mb-2">Login Necessário</h1>
           <p className="text-muted-foreground mb-4">{error}</p>
           <Link
             to="/login"
             className="inline-flex items-center justify-center px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"
           >
-            Go to Login
+            Ir para Login
           </Link>
         </div>
       </div>
@@ -200,7 +200,7 @@ export default function InventoryListPage() {
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="text-center max-w-md">
           <Package className="h-12 w-12 mx-auto mb-4 text-destructive" />
-          <h1 className="text-xl font-semibold mb-2">Error</h1>
+          <h1 className="text-xl font-semibold mb-2">Erro</h1>
           <p className="text-muted-foreground">{error}</p>
         </div>
       </div>
@@ -214,15 +214,15 @@ export default function InventoryListPage() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-xl font-bold">Inventory</h1>
+              <h1 className="text-xl font-bold">Estoque</h1>
               <p className="text-sm text-muted-foreground">
-                {total} items • {physicalCount} products • {serviceCount} services
+                {total} itens • {physicalCount} produtos • {serviceCount} serviços
               </p>
             </div>
             <Link to="/backoffice/inventory/new">
               <Button>
                 <Plus className="h-4 w-4 mr-2" />
-                Add Item
+                Adicionar Item
               </Button>
             </Link>
           </div>
@@ -235,7 +235,7 @@ export default function InventoryListPage() {
               <Input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search products and services..."
+                placeholder="Buscar produtos e serviços..."
                 className="pl-9"
               />
             </div>
@@ -251,7 +251,7 @@ export default function InventoryListPage() {
                     : "text-muted-foreground hover:text-foreground"
                 )}
               >
-                All
+                Todos
               </button>
               <button
                 onClick={() => setFilterType('physical')}
@@ -263,7 +263,7 @@ export default function InventoryListPage() {
                 )}
               >
                 <Package className="h-3.5 w-3.5" />
-                Products
+                Produtos
               </button>
               <button
                 onClick={() => setFilterType('service')}
@@ -275,7 +275,7 @@ export default function InventoryListPage() {
                 )}
               >
                 <Wrench className="h-3.5 w-3.5" />
-                Services
+                Serviços
               </button>
             </div>
 
@@ -284,10 +284,10 @@ export default function InventoryListPage() {
               <Select value={filterCategory} onValueChange={setFilterCategory}>
                 <SelectTrigger className="w-[180px]">
                   <Filter className="h-4 w-4 mr-2" />
-                  <SelectValue placeholder="All Categories" />
+                  <SelectValue placeholder="Todas Categorias" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Categories</SelectItem>
+                  <SelectItem value="">Todas Categorias</SelectItem>
                   {categories.map((cat) => (
                     <SelectItem key={cat.id} value={cat.id}>
                       {cat.name}
@@ -313,7 +313,7 @@ export default function InventoryListPage() {
               {searchQuery || filterType !== 'all' || filterCategory ? (
                 <>
                   <Search className="h-12 w-12 mx-auto mb-4 opacity-30" />
-                  <p>No items match your filters</p>
+                  <p>Nenhum item corresponde aos seus filtros</p>
                   <Button
                     variant="link"
                     onClick={() => {
@@ -322,18 +322,18 @@ export default function InventoryListPage() {
                       setFilterCategory('');
                     }}
                   >
-                    Clear filters
+                    Limpar filtros
                   </Button>
                 </>
               ) : (
                 <>
                   <Package className="h-12 w-12 mx-auto mb-4 opacity-30" />
-                  <p>No products or services yet</p>
-                  <p className="text-sm mt-1 mb-4">Add your first item to get started</p>
+                  <p>Nenhum produto ou serviço ainda</p>
+                  <p className="text-sm mt-1 mb-4">Adicione seu primeiro item para começar</p>
                   <Link to="/backoffice/inventory/new">
                     <Button>
                       <Plus className="h-4 w-4 mr-2" />
-                      Add Item
+                      Adicionar Item
                     </Button>
                   </Link>
                 </>

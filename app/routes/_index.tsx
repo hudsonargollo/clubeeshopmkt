@@ -16,8 +16,8 @@ import { ClientOnly } from '~/components/ui/ClientOnly';
 
 export const meta: MetaFunction = () => {
   return [
-    { title: 'ClubeeShopMkt - Multi-Tenant Retail Platform' },
-    { name: 'description', content: 'Launch your online shop in minutes. Edge-native multi-tenant retail platform with real-time inventory, POS, and webshop.' },
+    { title: 'ClubeeShopMkt - Plataforma Multi-Tenant de Varejo' },
+    { name: 'description', content: 'Lance sua loja online em minutos. Plataforma de varejo multi-tenant nativa em edge com estoque em tempo real, PDV e webshop.' },
   ];
 };
 
@@ -41,22 +41,22 @@ function HeroSection() {
         <div className="mb-6">
           <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm border border-white/20 dark:border-white/10 text-sm font-medium text-muted-foreground">
             <Store className="h-4 w-4" />
-            Multi-Tenant SaaS Platform
+            Plataforma SaaS Multi-Tenant
           </span>
         </div>
 
         {/* Headline */}
         <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-foreground mb-6">
-          Launch Your Shop{' '}
+          Lance Sua Loja{' '}
           <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            in Minutes
+            em Minutos
           </span>
         </h1>
 
         {/* Subheadline */}
         <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
-          The complete retail platform for modern businesses. Manage inventory, 
-          process sales, and run your webshop — all from one place.
+          A plataforma completa de varejo para negócios modernos. Gerencie estoque, 
+          processe vendas e administre sua webshop — tudo em um só lugar.
         </p>
 
         {/* CTAs */}
@@ -66,7 +66,7 @@ function HeroSection() {
               size="lg"
               className="h-12 px-8 text-base bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all duration-300 w-full"
             >
-              Start for Free
+              Começar Grátis
               <ArrowRight className="h-5 w-5 ml-2" />
             </Button>
           </Link>
@@ -77,14 +77,14 @@ function HeroSection() {
               variant="outline"
               className="h-12 px-8 text-base bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm border-white/20 dark:border-white/10 hover:bg-white/80 dark:hover:bg-slate-800/80 w-full"
             >
-              Login
+              Entrar
             </Button>
           </Link>
         </div>
 
         {/* Trust indicators */}
         <p className="text-sm text-muted-foreground mt-8">
-          Free to start • No credit card required • Setup in under 60 seconds
+          Grátis para começar • Sem cartão de crédito • Configure em menos de 60 segundos
         </p>
       </div>
     </section>
@@ -96,12 +96,12 @@ function HeroSection() {
  * Features section data
  */
 const features = [
-  { title: 'Inventory Management', description: 'Track stock in real-time with barcode scanning. Get alerts when items run low.', icon: Package, gradient: 'from-blue-500 to-cyan-500' },
-  { title: 'Multi-Tenant', description: 'Each shop gets its own subdomain and completely isolated data.', icon: Building2 },
-  { title: 'POS System', description: 'Process walk-in sales instantly with our intuitive point-of-sale interface.', icon: CreditCard },
-  { title: 'Services Support', description: 'Sell services alongside physical products with flexible pricing.', icon: Wrench },
-  { title: 'Smart Categories', description: 'Organize your catalog with custom categories and filters.', icon: FolderTree },
-  { title: 'Real-Time Sync', description: 'Changes appear instantly everywhere. Powered by edge computing.', icon: RefreshCw, gradient: 'from-purple-500 to-pink-500' },
+  { title: 'Gestão de Estoque', description: 'Rastreie estoque em tempo real com leitura de código de barras. Receba alertas quando itens estiverem acabando.', icon: Package, gradient: 'from-blue-500 to-cyan-500' },
+  { title: 'Multi-Tenant', description: 'Cada loja recebe seu próprio subdomínio e dados completamente isolados.', icon: Building2 },
+  { title: 'Sistema PDV', description: 'Processe vendas presenciais instantaneamente com nossa interface intuitiva de ponto de venda.', icon: CreditCard },
+  { title: 'Suporte a Serviços', description: 'Venda serviços junto com produtos físicos com preços flexíveis.', icon: Wrench },
+  { title: 'Categorias Inteligentes', description: 'Organize seu catálogo com categorias e filtros personalizados.', icon: FolderTree },
+  { title: 'Sincronização em Tempo Real', description: 'Mudanças aparecem instantaneamente em todos os lugares. Alimentado por edge computing.', icon: RefreshCw, gradient: 'from-purple-500 to-pink-500' },
 ];
 
 /**
@@ -150,10 +150,10 @@ function FeaturesGrid() {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground mb-4">
-            Everything You Need to Run Your Shop
+            Tudo Que Você Precisa Para Administrar Sua Loja
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            From inventory to checkout, we've got you covered with powerful features that work seamlessly together.
+            Do estoque ao checkout, nós cobrimos você com recursos poderosos que funcionam perfeitamente juntos.
           </p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -170,9 +170,9 @@ function FeaturesGrid() {
  * How It Works Section
  */
 const steps = [
-  { icon: Store, title: 'Create Your Shop', description: 'Sign up with Google and set up your shop in under 60 seconds.' },
-  { icon: Package, title: 'Add Products', description: 'Import your catalog or add products one by one with barcode scanning.' },
-  { icon: ShoppingCart, title: 'Start Selling', description: 'Use the POS for walk-ins or share your webshop link with customers.' },
+  { icon: Store, title: 'Crie Sua Loja', description: 'Cadastre-se com Google e configure sua loja em menos de 60 segundos.' },
+  { icon: Package, title: 'Adicione Produtos', description: 'Importe seu catálogo ou adicione produtos um por um com leitura de código de barras.' },
+  { icon: ShoppingCart, title: 'Comece a Vender', description: 'Use o PDV para vendas presenciais ou compartilhe o link da sua webshop com clientes.' },
 ];
 
 function HowItWorksSection() {
@@ -181,7 +181,7 @@ function HowItWorksSection() {
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground mb-4">
-            Get Started in 3 Simple Steps
+            Comece em 3 Passos Simples
           </h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -192,7 +192,7 @@ function HowItWorksSection() {
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 text-white mb-4">
                   <Icon className="h-8 w-8" />
                 </div>
-                <div className="text-sm font-medium text-muted-foreground mb-2">Step {index + 1}</div>
+                <div className="text-sm font-medium text-muted-foreground mb-2">Passo {index + 1}</div>
                 <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
                 <p className="text-muted-foreground">{step.description}</p>
               </div>
@@ -209,10 +209,10 @@ function HowItWorksSection() {
  * Benefits Section
  */
 const benefits = [
-  { icon: Zap, text: 'Lightning fast edge computing' },
-  { icon: Shield, text: 'Enterprise-grade security' },
-  { icon: Globe, text: 'Works on any device' },
-  { icon: Scan, text: 'Barcode scanner support' },
+  { icon: Zap, text: 'Edge computing ultrarrápido' },
+  { icon: Shield, text: 'Segurança de nível empresarial' },
+  { icon: Globe, text: 'Funciona em qualquer dispositivo' },
+  { icon: Scan, text: 'Suporte a leitor de código de barras' },
 ];
 
 function BenefitsSection() {
@@ -243,10 +243,10 @@ function CTASection() {
     <section className="relative px-4 py-24">
       <div className="max-w-3xl mx-auto text-center space-y-6">
         <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
-          Ready to Launch Your Shop?
+          Pronto Para Lançar Sua Loja?
         </h2>
         <p className="text-lg text-muted-foreground">
-          Join thousands of businesses already using ClubeeShopMkt to manage their retail operations.
+          Junte-se a milhares de negócios que já usam ClubeeShopMkt para gerenciar suas operações de varejo.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
           <Link to="/signup">
@@ -255,7 +255,7 @@ function CTASection() {
               className="h-12 px-8 text-base bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg w-full"
             >
               <CheckCircle2 className="h-5 w-5 mr-2" />
-              Get Started Free
+              Começar Grátis
             </Button>
           </Link>
         </div>
@@ -276,7 +276,7 @@ function Footer() {
           <span className="font-semibold">ClubeeShopMkt</span>
         </div>
         <p className="text-sm text-muted-foreground">
-          © {new Date().getFullYear()} ClubeeShopMkt. All rights reserved.
+          © {new Date().getFullYear()} ClubeeShopMkt. Todos os direitos reservados.
         </p>
       </div>
     </footer>

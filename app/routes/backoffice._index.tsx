@@ -23,7 +23,7 @@ import { Scan, Package, Truck, Settings, AlertCircle, LogIn, LogOut, Loader2 } f
 export const meta: MetaFunction = () => {
   return [
     { title: 'Backoffice - ClubeeShopMkt' },
-    { name: 'description', content: 'Staff inventory management dashboard' },
+    { name: 'description', content: 'Painel de gestão de estoque para funcionários' },
   ];
 };
 
@@ -320,7 +320,7 @@ export default function BackofficeDashboard() {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
-          <p className="text-muted-foreground">Loading...</p>
+          <p className="text-muted-foreground">Carregando...</p>
         </div>
       </div>
     );
@@ -336,13 +336,13 @@ export default function BackofficeDashboard() {
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="text-center max-w-md">
           <LogIn className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-          <h1 className="text-xl font-semibold mb-2">Login Required</h1>
-          <p className="text-muted-foreground mb-4">{error || 'Please log in to access the backoffice'}</p>
+          <h1 className="text-xl font-semibold mb-2">Login Necessário</h1>
+          <p className="text-muted-foreground mb-4">{error || 'Faça login para acessar o backoffice'}</p>
           <a
             href="/login"
             className="inline-flex items-center justify-center px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"
           >
-            Go to Login
+            Ir para Login
           </a>
         </div>
       </div>
@@ -355,7 +355,7 @@ export default function BackofficeDashboard() {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
-          <p className="text-muted-foreground">Loading your data...</p>
+          <p className="text-muted-foreground">Carregando seus dados...</p>
         </div>
       </div>
     );
@@ -367,7 +367,7 @@ export default function BackofficeDashboard() {
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="text-center max-w-md">
           <AlertCircle className="h-12 w-12 mx-auto mb-4 text-destructive" />
-          <h1 className="text-xl font-semibold mb-2">Access Error</h1>
+          <h1 className="text-xl font-semibold mb-2">Erro de Acesso</h1>
           <p className="text-muted-foreground">{error}</p>
         </div>
       </div>
@@ -382,19 +382,19 @@ export default function BackofficeDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-xl font-bold">Backoffice</h1>
-              <p className="text-sm text-muted-foreground">Inventory Manager</p>
+              <p className="text-sm text-muted-foreground">Gerenciador de Estoque</p>
             </div>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <div className={`w-2 h-2 rounded-full ${scannerState.isProcessing ? 'bg-yellow-500 animate-pulse' : 'bg-green-500'}`} />
-                <span className="text-xs text-muted-foreground">Scanner Ready</span>
+                <span className="text-xs text-muted-foreground">Scanner Pronto</span>
               </div>
               <button
                 onClick={logout}
                 className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted"
               >
                 <LogOut className="h-4 w-4" />
-                Logout
+                Sair
               </button>
             </div>
           </div>
@@ -411,7 +411,10 @@ export default function BackofficeDashboard() {
                     : 'bg-muted hover:bg-muted/80'
                 }`}
               >
-                {view.charAt(0).toUpperCase() + view.slice(1)}
+                {view === 'inventory' ? 'Estoque' : 
+                 view === 'orders' ? 'Pedidos' : 
+                 view === 'deliveries' ? 'Entregas' : 
+                 'Configurações'}
               </button>
             ))}
           </div>
@@ -423,19 +426,19 @@ export default function BackofficeDashboard() {
         {currentView === 'inventory' && (
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold">Products ({products.length})</h2>
+              <h2 className="text-lg font-semibold">Produtos ({products.length})</h2>
               <button
                 onClick={() => setSearchOpen(true)}
                 className="px-4 py-2 text-sm bg-muted rounded-lg hover:bg-muted/80"
               >
-                Search (⌘K)
+                Buscar (⌘K)
               </button>
             </div>
             {products.length === 0 ? (
               <div className="py-12 text-center text-muted-foreground">
                 <Package className="h-12 w-12 mx-auto mb-4 opacity-30" />
-                <p>No products in inventory</p>
-                <p className="text-sm mt-1">Add products to get started</p>
+                <p>Nenhum produto no estoque</p>
+                <p className="text-sm mt-1">Adicione produtos para começar</p>
               </div>
             ) : (
               <ProductGrid products={products} onProductClick={handleProductClick} />
@@ -446,8 +449,8 @@ export default function BackofficeDashboard() {
         {currentView === 'orders' && (
           <div className="text-center py-12 text-muted-foreground">
             <Package className="h-12 w-12 mx-auto mb-4 opacity-30" />
-            <p>Order management</p>
-            <p className="text-sm mt-1">{orders.length} active orders</p>
+            <p>Gestão de pedidos</p>
+            <p className="text-sm mt-1">{orders.length} pedidos ativos</p>
           </div>
         )}
 
@@ -461,7 +464,7 @@ export default function BackofficeDashboard() {
         {currentView === 'settings' && (
           <div className="text-center py-12 text-muted-foreground">
             <Settings className="h-12 w-12 mx-auto mb-4 opacity-30" />
-            <p>Settings coming soon</p>
+            <p>Configurações em breve</p>
           </div>
         )}
       </main>

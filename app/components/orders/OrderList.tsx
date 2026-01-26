@@ -182,7 +182,7 @@ export function OrderList({
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <TabsList>
             <TabsTrigger value="active">
-              Active
+              Ativos
               {tabCounts.active > 0 && (
                 <span className="ml-1.5 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium">
                   {tabCounts.active}
@@ -190,7 +190,7 @@ export function OrderList({
               )}
             </TabsTrigger>
             <TabsTrigger value="completed">
-              Completed
+              Concluídos
               {tabCounts.completed > 0 && (
                 <span className="ml-1.5 rounded-full bg-muted px-2 py-0.5 text-xs font-medium">
                   {tabCounts.completed}
@@ -198,7 +198,7 @@ export function OrderList({
               )}
             </TabsTrigger>
             <TabsTrigger value="cancelled">
-              Cancelled
+              Cancelados
               {tabCounts.cancelled > 0 && (
                 <span className="ml-1.5 rounded-full bg-muted px-2 py-0.5 text-xs font-medium">
                   {tabCounts.cancelled}
@@ -215,7 +215,7 @@ export function OrderList({
             className={cn(hasActiveFilters && "border-primary text-primary")}
           >
             <Filter className="h-4 w-4 mr-2" />
-            Filters
+            Filtros
             {hasActiveFilters && (
               <span className="ml-1.5 rounded-full bg-primary text-primary-foreground px-1.5 py-0.5 text-xs">
                 {[filters.dateFrom, filters.dateTo, filters.status].filter(Boolean).length}
@@ -240,10 +240,10 @@ export function OrderList({
                   <label className="text-sm font-medium text-muted-foreground">Status</label>
                   <Select value={filters.status || ''} onValueChange={handleStatusChange}>
                     <SelectTrigger className="w-[160px]">
-                      <SelectValue placeholder="All statuses" />
+                      <SelectValue placeholder="Todos os status" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All statuses</SelectItem>
+                      <SelectItem value="">Todos os status</SelectItem>
                       {availableStatuses.map((status) => (
                         <SelectItem key={status} value={status}>
                           {STATUS_LABELS[status]}

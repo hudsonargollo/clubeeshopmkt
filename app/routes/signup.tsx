@@ -15,8 +15,8 @@ import { UserPlus, AlertCircle, Loader2, CheckCircle } from 'lucide-react';
 
 export const meta: MetaFunction = () => {
   return [
-    { title: 'Sign Up - ClubeeShopMkt' },
-    { name: 'description', content: 'Create a staff account' },
+    { title: 'Criar Conta - ClubeeShopMkt' },
+    { name: 'description', content: 'Crie uma conta de funcionário' },
   ];
 };
 
@@ -41,7 +41,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
   if (!env?.SUPABASE_URL || !env?.SUPABASE_ANON_KEY) {
     console.error('Missing Supabase environment variables');
     return json<ActionData>({ 
-      error: 'Server configuration error. Please contact support.' 
+      error: 'Erro de configuração do servidor. Entre em contato com o suporte.' 
     }, { status: 500 });
   }
   
@@ -71,12 +71,12 @@ export async function action({ request, context }: ActionFunctionArgs) {
           // Check if it's a configuration error
           if (error.message.includes('Provider') || error.message.includes('not configured')) {
             return json<ActionData>({ 
-              error: 'Google sign-up is not yet configured. Please use email/password signup for now.' 
+              error: 'O cadastro com Google ainda não está configurado. Use e-mail/senha por enquanto.' 
             }, { status: 400 });
           }
           
           return json<ActionData>({ 
-            error: `Google sign-up failed: ${error.message}` 
+            error: `Falha no cadastro com Google: ${error.message}` 
           }, { status: 400 });
         }
 
@@ -91,12 +91,12 @@ export async function action({ request, context }: ActionFunctionArgs) {
 
         console.error('No OAuth URL returned from Supabase');
         return json<ActionData>({ 
-          error: 'Google sign-up is not yet configured. Please use email/password signup for now.' 
+          error: 'O cadastro com Google ainda não está configurado. Use e-mail/senha por enquanto.' 
         }, { status: 400 });
       } catch (oauthError) {
         console.error('OAuth setup error:', oauthError);
         return json<ActionData>({ 
-          error: 'Google sign-up is not yet configured. Please use email/password signup for now.' 
+          error: 'O cadastro com Google ainda não está configurado. Use e-mail/senha por enquanto.' 
         }, { status: 400 });
       }
     }
@@ -109,15 +109,15 @@ export async function action({ request, context }: ActionFunctionArgs) {
     console.log('Signup action - Email signup attempt for:', email);
 
     if (!email || !password) {
-      return json<ActionData>({ error: 'Email and password are required' }, { status: 400 });
+      return json<ActionData>({ error: 'E-mail e senha são obrigatórios' }, { status: 400 });
     }
 
     if (password !== confirmPassword) {
-      return json<ActionData>({ error: 'Passwords do not match' }, { status: 400 });
+      return json<ActionData>({ error: 'As senhas não coincidem' }, { status: 400 });
     }
 
     if (password.length < 6) {
-      return json<ActionData>({ error: 'Password must be at least 6 characters' }, { status: 400 });
+      return json<ActionData>({ error: 'A senha deve ter pelo menos 6 caracteres' }, { status: 400 });
     }
 
     const { data, error } = await supabase.auth.signUp({
@@ -132,14 +132,14 @@ export async function action({ request, context }: ActionFunctionArgs) {
 
     if (data.user?.identities?.length === 0) {
       return json<ActionData>({ 
-        error: 'An account with this email already exists. Please try logging in instead.' 
+        error: 'Já existe uma conta com este e-mail. Tente fazer login.' 
       }, { status: 400 });
     }
 
     console.log('Signup action - Account created successfully for:', email);
     return json<ActionData>({
       success: true,
-      message: 'Account created! You can now log in.',
+      message: 'Conta criada! Agora você pode fazer login.',
     });
   } catch (err) {
     // Check if this is a redirect response (which is expected for OAuth)
@@ -150,13 +150,13 @@ export async function action({ request, context }: ActionFunctionArgs) {
     console.error('Signup error:', err);
     
     // Provide more specific error messages based on the error type
-    let errorMessage = 'An unexpected error occurred. Please try again.';
+    let errorMessage = 'Ocorreu um erro inesperado. Tente novamente.';
     
     if (err instanceof Error) {
       if (err.message.includes('fetch')) {
-        errorMessage = 'Network error. Please check your connection and try again.';
+        errorMessage = 'Erro de rede. Verifique sua conexão e tente novamente.';
       } else if (err.message.includes('OAuth')) {
-        errorMessage = 'OAuth configuration error. Please contact support.';
+        errorMessage = 'Erro de configuração OAuth. Entre em contato com o suporte.';
       }
     }
     
@@ -190,7 +190,7 @@ function GoogleSignUpButton() {
             <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
           </svg>
         )}
-        Continue with Google
+        Continuar com Google
       </Button>
     </Form>
   );
@@ -217,8 +217,8 @@ export default function SignupPage() {
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 mx-auto mb-4">
               <UserPlus className="h-8 w-8 text-white" />
             </div>
-            <CardTitle className="text-2xl">Create Account</CardTitle>
-            <CardDescription>Sign up to get started</CardDescription>
+            <CardTitle className="text-2xl">Criar Conta</CardTitle>
+            <CardDescription>Cadastre-se para começar</CardDescription>
           </CardHeader>
 
           <CardContent className="space-y-6">
@@ -230,7 +230,7 @@ export default function SignupPage() {
                 </div>
                 <Link to="/login">
                   <Button className="w-full">
-                    Go to Login
+                    Ir para Login
                   </Button>
                 </Link>
               </div>
@@ -246,7 +246,7 @@ export default function SignupPage() {
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
                     <span className="bg-white/80 dark:bg-slate-900/80 px-2 text-muted-foreground">
-                      Or continue with email
+                      Ou continue com e-mail
                     </span>
                   </div>
                 </div>
@@ -262,7 +262,7 @@ export default function SignupPage() {
 
                   <div>
                     <label htmlFor="email" className="block text-sm font-medium mb-1.5">
-                      Email
+                      E-mail
                     </label>
                     <Input
                       id="email"
@@ -270,14 +270,14 @@ export default function SignupPage() {
                       type="email"
                       autoComplete="email"
                       required
-                      placeholder="you@example.com"
+                      placeholder="voce@exemplo.com"
                       className="h-11"
                     />
                   </div>
 
                   <div>
                     <label htmlFor="password" className="block text-sm font-medium mb-1.5">
-                      Password
+                      Senha
                     </label>
                     <div className="relative">
                       <Input
@@ -295,14 +295,14 @@ export default function SignupPage() {
                         onClick={() => setShowPassword(!showPassword)}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground hover:text-foreground"
                       >
-                        {showPassword ? 'Hide' : 'Show'}
+                        {showPassword ? 'Ocultar' : 'Mostrar'}
                       </button>
                     </div>
                   </div>
 
                   <div>
                     <label htmlFor="confirmPassword" className="block text-sm font-medium mb-1.5">
-                      Confirm Password
+                      Confirmar Senha
                     </label>
                     <Input
                       id="confirmPassword"
@@ -320,10 +320,10 @@ export default function SignupPage() {
                     {isSubmitting ? (
                       <>
                         <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                        Creating account...
+                        Criando conta...
                       </>
                     ) : (
-                      'Create Account'
+                      'Criar Conta'
                     )}
                   </Button>
                 </Form>
@@ -335,14 +335,14 @@ export default function SignupPage() {
         {/* Footer links */}
         <div className="text-center text-sm text-muted-foreground mt-4 space-y-2">
           <p>
-            Already have an account?{' '}
+            Já tem uma conta?{' '}
             <Link to="/login" className="text-primary hover:underline">
-              Sign in
+              Entrar
             </Link>
           </p>
           <p>
             <Link to="/" className="hover:underline">
-              ← Back to Home
+              ← Voltar para Início
             </Link>
           </p>
         </div>

@@ -93,16 +93,16 @@ export function InventoryEditDrawer({
     const newErrors: Record<string, string> = {};
     
     if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
+      newErrors.name = 'Nome é obrigatório';
     }
     if (formData.type === 'physical' && !formData.barcode?.trim()) {
-      newErrors.barcode = 'Barcode is required for physical products';
+      newErrors.barcode = 'Código de barras é obrigatório para produtos físicos';
     }
     if (formData.price < 0) {
-      newErrors.price = 'Price cannot be negative';
+      newErrors.price = 'Preço não pode ser negativo';
     }
     if (formData.stock < 0) {
-      newErrors.stock = 'Stock cannot be negative';
+      newErrors.stock = 'Estoque não pode ser negativo';
     }
     
     setErrors(newErrors);
@@ -126,7 +126,7 @@ export function InventoryEditDrawer({
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent className="max-h-[85vh]">
         <DrawerHeader>
-          <DrawerTitle>Edit Inventory Item</DrawerTitle>
+          <DrawerTitle>Editar Item do Estoque</DrawerTitle>
           <DrawerDescription>
             {item.barcode} • {item.category}
           </DrawerDescription>
@@ -135,11 +135,11 @@ export function InventoryEditDrawer({
         <div className="px-4 py-2 space-y-4 overflow-y-auto">
           {/* Name */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">Name</label>
+            <label className="text-sm font-medium">Nome</label>
             <Input
               value={formData.name}
               onChange={(e) => handleChange('name', e.target.value)}
-              placeholder="Product name"
+              placeholder="Nome do produto"
               className={cn(errors.name && 'border-destructive')}
             />
             {errors.name && (
@@ -149,17 +149,17 @@ export function InventoryEditDrawer({
 
           {/* Category */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">Category</label>
+            <label className="text-sm font-medium">Categoria</label>
             <Input
               value={formData.category}
               onChange={(e) => handleChange('category', e.target.value)}
-              placeholder="Category"
+              placeholder="Categoria"
             />
           </div>
 
           {/* Price */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">Price</label>
+            <label className="text-sm font-medium">Preço</label>
             <Input
               type="number"
               step="0.01"
@@ -175,7 +175,7 @@ export function InventoryEditDrawer({
 
           {/* Stock with quick adjust buttons */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">Stock</label>
+            <label className="text-sm font-medium">Estoque</label>
             <div className="flex items-center gap-2">
               <Button
                 type="button"
@@ -226,7 +226,7 @@ export function InventoryEditDrawer({
 
           {/* Barcode (read-only) */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">Barcode</label>
+            <label className="text-sm font-medium">Código de Barras</label>
             <Input
               value={formData.barcode || ''}
               disabled
@@ -243,17 +243,17 @@ export function InventoryEditDrawer({
                 onClick={() => onDelete(item.id)}
                 disabled={isSaving}
               >
-                Delete
+                Excluir
               </Button>
             )}
             <div className="flex-1" />
             <DrawerClose asChild>
               <Button variant="outline" disabled={isSaving}>
-                Cancel
+                Cancelar
               </Button>
             </DrawerClose>
             <Button onClick={handleSave} disabled={isSaving}>
-              {isSaving ? 'Saving...' : 'Save'}
+              {isSaving ? 'Salvando...' : 'Salvar'}
             </Button>
           </div>
         </DrawerFooter>
