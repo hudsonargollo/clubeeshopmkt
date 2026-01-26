@@ -230,12 +230,15 @@ export default function LoginPage() {
                     autoComplete="current-password"
                     required
                     placeholder="••••••••"
-                    className="h-11 pr-16"
+                    className="h-11 pr-20"
                   />
                   <button
                     type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground hover:text-foreground"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setShowPassword(!showPassword);
+                    }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground hover:text-foreground transition-colors z-10 cursor-pointer"
                   >
                     {showPassword ? 'Ocultar' : 'Mostrar'}
                   </button>

@@ -288,12 +288,15 @@ export default function SignupPage() {
                         required
                         minLength={6}
                         placeholder="••••••••"
-                        className="h-11 pr-16"
+                        className="h-11 pr-20"
                       />
                       <button
                         type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground hover:text-foreground"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setShowPassword(!showPassword);
+                        }}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground hover:text-foreground transition-colors z-10 cursor-pointer"
                       >
                         {showPassword ? 'Ocultar' : 'Mostrar'}
                       </button>
@@ -304,16 +307,28 @@ export default function SignupPage() {
                     <label htmlFor="confirmPassword" className="block text-sm font-medium mb-1.5">
                       Confirmar Senha
                     </label>
-                    <Input
-                      id="confirmPassword"
-                      name="confirmPassword"
-                      type={showPassword ? 'text' : 'password'}
-                      autoComplete="new-password"
-                      required
-                      minLength={6}
-                      placeholder="••••••••"
-                      className="h-11"
-                    />
+                    <div className="relative">
+                      <Input
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        type={showPassword ? 'text' : 'password'}
+                        autoComplete="new-password"
+                        required
+                        minLength={6}
+                        placeholder="••••••••"
+                        className="h-11 pr-20"
+                      />
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setShowPassword(!showPassword);
+                        }}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground hover:text-foreground transition-colors z-10 cursor-pointer"
+                      >
+                        {showPassword ? 'Ocultar' : 'Mostrar'}
+                      </button>
+                    </div>
                   </div>
 
                   <Button type="submit" disabled={isSubmitting} className="w-full h-11">
