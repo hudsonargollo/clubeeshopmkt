@@ -234,11 +234,9 @@ export default function LoginPage() {
                   />
                   <button
                     type="button"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setShowPassword(!showPassword);
-                    }}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground hover:text-foreground transition-colors z-10 cursor-pointer"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground hover:text-foreground transition-colors z-10 cursor-pointer px-1 py-1"
+                    tabIndex={-1}
                   >
                     {showPassword ? 'Ocultar' : 'Mostrar'}
                   </button>
