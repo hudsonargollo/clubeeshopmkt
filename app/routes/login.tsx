@@ -86,6 +86,14 @@ export async function action({ request, context }: ActionFunctionArgs) {
 
   if (error) {
     console.error('Supabase auth error:', error.message, error.status, error.name);
+    
+    // Handle email not confirmed error
+    if (error.message.includes('Email not confirmed')) {
+      return json<ActionData>({ 
+        error: 'Por favor, confirme seu e-mail antes de fazer login. Verifique sua caixa de entrada.' 
+      }, { status: 401 });
+    }
+    
     return json<ActionData>({ error: error.message || 'E-mail ou senha inválidos' }, { status: 401 });
   }
 

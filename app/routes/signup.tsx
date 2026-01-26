@@ -137,6 +137,15 @@ export async function action({ request, context }: ActionFunctionArgs) {
     }
 
     console.log('Signup action - Account created successfully for:', email);
+    
+    // Check if email confirmation is required
+    if (data.user && !data.session) {
+      return json<ActionData>({
+        success: true,
+        message: 'Conta criada! Verifique seu e-mail para confirmar sua conta antes de fazer login.',
+      });
+    }
+    
     return json<ActionData>({
       success: true,
       message: 'Conta criada! Agora você pode fazer login.',
