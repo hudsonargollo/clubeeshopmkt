@@ -1,0 +1,151 @@
+═══════════════════════════════════════════════════════════════════════════════
+  CUSTOM DOMAIN SETUP: eshop.clubemkt.digital
+═══════════════════════════════════════════════════════════════════════════════
+
+📋 QUICK STEPS TO ADD YOUR CUSTOM DOMAIN
+
+Since Wrangler CLI doesn't support adding custom domains in version 3.x, you need
+to use the Cloudflare Dashboard. Follow these steps:
+
+───────────────────────────────────────────────────────────────────────────────
+STEP 1: ADD CUSTOM DOMAIN IN CLOUDFLARE DASHBOARD
+───────────────────────────────────────────────────────────────────────────────
+
+1. Go to: https://dash.cloudflare.com
+2. Click "Workers & Pages" in the left sidebar
+3. Find and click on "clubeeshopmkt"
+4. Click the "Settings" tab
+5. Scroll to "Domains & Routes" section
+6. Click "Add" next to "Custom Domains"
+7. Enter: eshop.clubemkt.digital
+8. Click "Add Custom Domain"
+
+✅ Cloudflare will automatically:
+   - Create the DNS record
+   - Provision SSL certificate
+   - Route traffic to your worker
+
+───────────────────────────────────────────────────────────────────────────────
+STEP 2: VERIFY DNS CONFIGURATION (AUTOMATIC)
+───────────────────────────────────────────────────────────────────────────────
+
+Cloudflare creates this DNS record automatically:
+
+Type:    AAAA
+Name:    eshop
+Content: 100::
+Proxy:   Proxied (orange cloud)
+
+To verify:
+1. Go to your domain's "DNS" tab in Cloudflare
+2. Look for the "eshop" record
+3. Ensure it's proxied (orange cloud icon)
+
+───────────────────────────────────────────────────────────────────────────────
+STEP 3: CONFIGURE SSL/TLS
+───────────────────────────────────────────────────────────────────────────────
+
+1. Go to "SSL/TLS" → "Overview"
+2. Set encryption mode to: Full (strict)
+3. Go to "SSL/TLS" → "Edge Certificates"
+4. Ensure "Always Use HTTPS" is ON
+5. Verify "Universal SSL Certificate" is Active
+
+───────────────────────────────────────────────────────────────────────────────
+STEP 4: UPDATE SUPABASE OAUTH (IMPORTANT!)
+───────────────────────────────────────────────────────────────────────────────
+
+1. Go to: https://supabase.com/dashboard
+2. Select your ClubeeShopMkt project
+3. Go to "Authentication" → "URL Configuration"
+4. Update "Site URL" to: https://eshop.clubemkt.digital
+5. Add to "Redirect URLs":
+   - https://eshop.clubemkt.digital/auth/callback
+   - https://clubeeshopmkt.hudsonargollo2.workers.dev/auth/callback
+6. Click "Save"
+
+───────────────────────────────────────────────────────────────────────────────
+STEP 5: TEST YOUR CUSTOM DOMAIN
+───────────────────────────────────────────────────────────────────────────────
+
+Wait 5-10 minutes for DNS propagation, then test:
+
+In Terminal:
+  nslookup eshop.clubemkt.digital
+  curl -I https://eshop.clubemkt.digital
+
+In Browser:
+  https://eshop.clubemkt.digital
+  https://eshop.clubemkt.digital/signup
+  https://eshop.clubemkt.digital/login
+
+───────────────────────────────────────────────────────────────────────────────
+✅ VERIFICATION CHECKLIST
+───────────────────────────────────────────────────────────────────────────────
+
+□ Custom domain added in Cloudflare Dashboard
+□ DNS record created and proxied
+□ SSL/TLS set to Full (strict)
+□ Always Use HTTPS enabled
+□ Supabase OAuth URLs updated
+□ Domain resolves (nslookup test passes)
+□ HTTPS works (curl test returns 200)
+□ Landing page loads in browser
+□ Signup/Login pages work
+□ OAuth redirects properly
+
+───────────────────────────────────────────────────────────────────────────────
+🎯 EXPECTED RESULTS
+───────────────────────────────────────────────────────────────────────────────
+
+After setup, your application will be available at:
+
+Primary:    https://eshop.clubemkt.digital
+Signup:     https://eshop.clubemkt.digital/signup
+Login:      https://eshop.clubemkt.digital/login
+Backoffice: https://eshop.clubemkt.digital/backoffice
+Portal:     https://eshop.clubemkt.digital/portal
+
+Backup URL (still works):
+            https://clubeeshopmkt.hudsonargollo2.workers.dev
+
+───────────────────────────────────────────────────────────────────────────────
+🚨 TROUBLESHOOTING
+───────────────────────────────────────────────────────────────────────────────
+
+Domain not resolving?
+  → Wait 5-10 minutes for DNS propagation
+  → Check DNS record exists in Cloudflare
+  → Ensure orange cloud (proxied) is enabled
+
+SSL certificate error?
+  → Wait up to 24 hours for certificate provisioning
+  → Verify Universal SSL is enabled
+  → Check SSL/TLS mode is Full (strict)
+
+403 Forbidden?
+  → Verify custom domain is added to worker
+  → Ensure worker is deployed
+  → Try accessing workers.dev URL first
+
+OAuth not working?
+  → Update Supabase redirect URLs
+  → Clear browser cache and cookies
+  → Test in incognito mode
+
+───────────────────────────────────────────────────────────────────────────────
+📚 DOCUMENTATION
+───────────────────────────────────────────────────────────────────────────────
+
+Detailed guides available:
+  - SETUP_CUSTOM_DOMAIN.md (comprehensive guide)
+  - CUSTOM_DOMAIN_SETUP.md (original documentation)
+
+Cloudflare Docs:
+  https://developers.cloudflare.com/workers/configuration/routing/custom-domains/
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🎉 That's it! Your custom domain will be live in about 5-10 minutes.
+
+═══════════════════════════════════════════════════════════════════════════════
