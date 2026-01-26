@@ -143,14 +143,18 @@ export default function LoginPage() {
   // If login successful, store token and redirect
   useEffect(() => {
     if (actionData?.success && actionData.session) {
-      console.log('Login successful, storing tokens...');
-      localStorage.setItem('sb-access-token', actionData.session.access_token);
-      localStorage.setItem('sb-refresh-token', actionData.session.refresh_token);
-      console.log('Tokens stored, redirecting to /backoffice...');
-      // Small delay to ensure localStorage is written
-      setTimeout(() => {
-        window.location.href = '/backoffice';
-      }, 100);
+      const handleLogin = async () => {
+        console.log('Login successful, storing tokens...');
+        // Import storeTokens from auth.ts
+        const { storeTokens } = await import('~/lib/auth');
+        storeTokens(actionData.session.access_token, actionData.session.refresh_token);
+        console.log('Tokens stored, redirecting to /backoffice...');
+        // Small delay to ensure localStorage is written
+        setTimeout(() => {
+          window.location.href = '/backoffice';
+        }, 100);
+      };
+      handleLogin();
     }
   }, [actionData]);
 

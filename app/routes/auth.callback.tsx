@@ -9,6 +9,7 @@ import { redirect } from '@remix-run/cloudflare';
 import { useLoaderData, useNavigate } from '@remix-run/react';
 import { useEffect } from 'react';
 import { createSupabaseClient, type Env } from '~/lib/supabase.server';
+import { getPostAuthRedirect } from '~/lib/auth.server';
 import { Loader2, AlertCircle } from 'lucide-react';
 
 export const meta: MetaFunction = () => {
@@ -25,60 +26,6 @@ interface LoaderData {
     refresh_token: string;
   };
   redirectTo: string;
-}
-
-/**
- * Determines the redirect path based on user's tenant count and role
- * Requirements: 3.1, 4.1, 4.2
- * - Superadmin → /portal (can manage multiple tenants)
- * - 0 tenants → /onboarding (new user needs to create tenant)
- * - 1 tenant → /backoffice (regular user with their own tenant)
- */
-async function getPostAuthRedirect(
-  supabase: ReturnType<typeof createSupabaseClient>,
-  userId: string,
-  userEmail: string
-): Promise<string> {
-  try {
-    console.log('Getting post-auth redirect for user:', userId, userEmail);
-    
-    // Check if user is superadmin (you can define this by email or role)
-    const isSuperAdmin = userEmail === 'cavernacentral2@gmail.com';
-    
-    if (isSuperAdmin) {
-      console.log('User is superadmin, redirecting to portal');
-      return '/portal';
-    }
-
-    // For regular users, check their tenant assignments
-    const { data: userTenants, error } = await supabase
-      .from('user_tenants')
-      .select('tenant_id, role')
-      .eq('user_id', userId);
-
-    if (error) {
-      console.error('Error fetching user tenants:', error);
-      // If there's an error, send new users to onboarding
-      console.log('Database error, defaulting to onboarding');
-      return '/onboarding';
-    }
-
-    const tenantCount = userTenants?.length ?? 0;
-    console.log('User has', tenantCount, 'tenant assignments:', userTenants);
-
-    if (tenantCount === 0) {
-      // New user needs to create their tenant
-      console.log('No tenants found, redirecting to onboarding');
-      return '/onboarding';
-    } else {
-      // Regular user with their tenant goes to backoffice
-      console.log('User has tenants, redirecting to backoffice');
-      return '/backoffice';
-    }
-  } catch (error) {
-    console.error('Unexpected error in getPostAuthRedirect:', error);
-    return '/onboarding';
-  }
 }
 
 export async function loader({ request, context }: LoaderFunctionArgs) {
@@ -164,16 +111,20 @@ export default function AuthCallback() {
     if (data.session) {
       console.log('Auth callback - storing tokens and redirecting to:', data.redirectTo);
       
-      // Store tokens in localStorage
-      localStorage.setItem('sb-access-token', data.session.access_token);
-      localStorage.setItem('sb-refresh-token', data.session.refresh_token);
+      // Import storeTokens from auth.ts
+      const storeTokensAsync = async () => {
+        const { storeTokens } = await import('~/lib/auth');
+        storeTokens(data.session!.access_token, data.session!.refresh_token);
+        
+        // Use navigate instead of window.location.href for better SPA behavior
+        // Small delay to ensure localStorage is written
+        setTimeout(() => {
+          console.log('Auth callback - executing redirect to:', data.redirectTo);
+          navigate(data.redirectTo, { replace: true });
+        }, 100);
+      };
       
-      // Use navigate instead of window.location.href for better SPA behavior
-      // Small delay to ensure localStorage is written
-      setTimeout(() => {
-        console.log('Auth callback - executing redirect to:', data.redirectTo);
-        navigate(data.redirectTo, { replace: true });
-      }, 100);
+      storeTokensAsync();
     } else if (data.error) {
       console.log('Auth callback - error occurred:', data.error);
       // Redirect to landing page after showing error briefly

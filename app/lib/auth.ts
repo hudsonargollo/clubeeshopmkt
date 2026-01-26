@@ -59,9 +59,8 @@ export async function signOut() {
   
   const { error } = await supabase.auth.signOut();
   
-  // Clear local storage tokens
-  localStorage.removeItem('sb-access-token');
-  localStorage.removeItem('sb-refresh-token');
+  // Clear local storage tokens using utility function
+  clearTokens();
   
   if (error) {
     throw error;
@@ -69,11 +68,33 @@ export async function signOut() {
 }
 
 /**
- * Gets the current session from local storage
+ * Token storage keys
+ * Requirements: 4.1, 4.2
  */
-export function getStoredSession() {
-  const accessToken = localStorage.getItem('sb-access-token');
-  const refreshToken = localStorage.getItem('sb-refresh-token');
+const ACCESS_TOKEN_KEY = 'sb-access-token';
+const REFRESH_TOKEN_KEY = 'sb-refresh-token';
+
+/**
+ * Stores authentication tokens in localStorage
+ * Requirements: 4.1, 4.2
+ * 
+ * @param accessToken - JWT access token
+ * @param refreshToken - JWT refresh token
+ */
+export function storeTokens(accessToken: string, refreshToken: string): void {
+  localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
+  localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+}
+
+/**
+ * Retrieves stored authentication tokens from localStorage
+ * Requirements: 4.3
+ * 
+ * @returns Token object or null if not found
+ */
+export function getStoredTokens(): { access_token: string; refresh_token: string } | null {
+  const accessToken = localStorage.getItem(ACCESS_TOKEN_KEY);
+  const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
   
   if (!accessToken) {
     return null;
@@ -81,8 +102,25 @@ export function getStoredSession() {
   
   return {
     access_token: accessToken,
-    refresh_token: refreshToken,
+    refresh_token: refreshToken || '',
   };
+}
+
+/**
+ * Clears all authentication tokens from localStorage
+ * Requirements: 4.6
+ */
+export function clearTokens(): void {
+  localStorage.removeItem(ACCESS_TOKEN_KEY);
+  localStorage.removeItem(REFRESH_TOKEN_KEY);
+}
+
+/**
+ * Gets the current session from local storage
+ * @deprecated Use getStoredTokens() instead
+ */
+export function getStoredSession() {
+  return getStoredTokens();
 }
 
 /**

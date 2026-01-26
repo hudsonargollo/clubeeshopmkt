@@ -16,6 +16,63 @@ export interface Env {
 }
 
 /**
+ * Validation result interface
+ */
+export interface ValidationResult {
+  valid: boolean;
+  errors: string[];
+}
+
+/**
+ * Validates environment configuration for Supabase
+ * Checks that required environment variables are present and properly formatted
+ * 
+ * Requirements: 1.1, 1.2, 1.3
+ * 
+ * @param env - Environment configuration object
+ * @returns Validation result with errors array
+ */
+export function validateEnvironment(env: Partial<Env>): ValidationResult {
+  const errors: string[] = [];
+
+  // Validate SUPABASE_URL (Requirements: 1.1)
+  if (!env.SUPABASE_URL) {
+    errors.push("SUPABASE_URL is required");
+  } else if (typeof env.SUPABASE_URL !== "string" || env.SUPABASE_URL.trim() === "") {
+    errors.push("SUPABASE_URL must be a non-empty string");
+  } else if (!env.SUPABASE_URL.startsWith("https://")) {
+    errors.push("SUPABASE_URL must be a valid HTTPS URL");
+  } else {
+    // Additional URL format validation
+    try {
+      new URL(env.SUPABASE_URL);
+    } catch {
+      errors.push("SUPABASE_URL must be a valid URL format");
+    }
+  }
+
+  // Validate SUPABASE_ANON_KEY (Requirements: 1.2)
+  if (!env.SUPABASE_ANON_KEY) {
+    errors.push("SUPABASE_ANON_KEY is required");
+  } else if (typeof env.SUPABASE_ANON_KEY !== "string" || env.SUPABASE_ANON_KEY.trim() === "") {
+    errors.push("SUPABASE_ANON_KEY must be a non-empty string");
+  }
+
+  // Log validation failures (Requirements: 1.3)
+  if (errors.length > 0) {
+    console.error("[Environment Validation Failed]", {
+      errors,
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+  };
+}
+
+/**
  * Creates a Supabase client configured for Cloudflare Workers
  * Uses Supavisor connection pooling via port 6543 (Transaction Mode)
  * 
