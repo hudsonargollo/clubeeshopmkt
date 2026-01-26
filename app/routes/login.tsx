@@ -13,11 +13,12 @@ import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card';
 import { LogIn, AlertCircle, Loader2 } from 'lucide-react';
+import { t } from '~/lib/i18n';
 
 export const meta: MetaFunction = () => {
   return [
     { title: 'Login - ClubeeShopMkt' },
-    { name: 'description', content: 'Staff login for backoffice access' },
+    { name: 'description', content: 'Acesso ao painel administrativo' },
   ];
 };
 
@@ -37,7 +38,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
   console.log('Login action - SUPABASE_ANON_KEY:', env?.SUPABASE_ANON_KEY ? 'SET (length: ' + env?.SUPABASE_ANON_KEY?.length + ')' : 'MISSING');
   
   if (!env?.SUPABASE_URL || !env?.SUPABASE_ANON_KEY) {
-    return json<ActionData>({ error: 'Server configuration error' }, { status: 500 });
+    return json<ActionData>({ error: 'Erro de configuração do servidor' }, { status: 500 });
   }
   
   const formData = await request.formData();
@@ -56,7 +57,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
 
     if (error) {
       console.error('Google OAuth error:', error);
-      return json<ActionData>({ error: error.message || 'Google sign-in failed' }, { status: 400 });
+      return json<ActionData>({ error: error.message || 'Falha ao entrar com Google' }, { status: 400 });
     }
 
     if (data.url) {
@@ -67,7 +68,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
       });
     }
 
-    return json<ActionData>({ error: 'Failed to initiate Google sign-in' }, { status: 400 });
+    return json<ActionData>({ error: 'Falha ao iniciar login com Google' }, { status: 400 });
   }
 
   // Handle email/password login
@@ -75,7 +76,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
   const password = formData.get('password') as string;
 
   if (!email || !password) {
-    return json<ActionData>({ error: 'Email and password are required' }, { status: 400 });
+    return json<ActionData>({ error: 'E-mail e senha são obrigatórios' }, { status: 400 });
   }
 
   const { data, error } = await supabase.auth.signInWithPassword({
@@ -85,11 +86,11 @@ export async function action({ request, context }: ActionFunctionArgs) {
 
   if (error) {
     console.error('Supabase auth error:', error.message, error.status, error.name);
-    return json<ActionData>({ error: error.message || 'Invalid email or password' }, { status: 401 });
+    return json<ActionData>({ error: error.message || 'E-mail ou senha inválidos' }, { status: 401 });
   }
 
   if (!data.session) {
-    return json<ActionData>({ error: 'Authentication failed' }, { status: 401 });
+    return json<ActionData>({ error: 'Falha na autenticação' }, { status: 401 });
   }
 
   return json<ActionData>({
@@ -127,7 +128,7 @@ function GoogleSignInButton() {
             <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
           </svg>
         )}
-        Continue with Google
+        Continuar com Google
       </Button>
     </Form>
   );
@@ -173,8 +174,8 @@ export default function LoginPage() {
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 mx-auto mb-4">
               <LogIn className="h-8 w-8 text-white" />
             </div>
-            <CardTitle className="text-2xl">Welcome Back</CardTitle>
-            <CardDescription>Sign in to access the backoffice</CardDescription>
+            <CardTitle className="text-2xl">Bem-vindo de volta</CardTitle>
+            <CardDescription>Entre para acessar o painel administrativo</CardDescription>
           </CardHeader>
 
           <CardContent className="space-y-6">
@@ -188,7 +189,7 @@ export default function LoginPage() {
               </div>
               <div className="relative flex justify-center text-xs uppercase">
                 <span className="bg-white/80 dark:bg-slate-900/80 px-2 text-muted-foreground">
-                  Or continue with email
+                  Ou continue com e-mail
                 </span>
               </div>
             </div>
@@ -204,7 +205,7 @@ export default function LoginPage() {
 
               <div>
                 <label htmlFor="email" className="block text-sm font-medium mb-1.5">
-                  Email
+                  E-mail
                 </label>
                 <Input
                   id="email"
@@ -212,14 +213,14 @@ export default function LoginPage() {
                   type="email"
                   autoComplete="email"
                   required
-                  placeholder="you@example.com"
+                  placeholder="voce@exemplo.com"
                   className="h-11"
                 />
               </div>
 
               <div>
                 <label htmlFor="password" className="block text-sm font-medium mb-1.5">
-                  Password
+                  Senha
                 </label>
                 <div className="relative">
                   <Input
@@ -236,7 +237,7 @@ export default function LoginPage() {
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground hover:text-foreground"
                   >
-                    {showPassword ? 'Hide' : 'Show'}
+                    {showPassword ? 'Ocultar' : 'Mostrar'}
                   </button>
                 </div>
               </div>
@@ -245,10 +246,10 @@ export default function LoginPage() {
                 {isSubmitting ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    Signing in...
+                    Entrando...
                   </>
                 ) : (
-                  'Sign In'
+                  'Entrar'
                 )}
               </Button>
             </Form>
@@ -258,14 +259,14 @@ export default function LoginPage() {
         {/* Footer links */}
         <div className="text-center text-sm text-muted-foreground mt-4 space-y-2">
           <p>
-            Don't have an account?{' '}
+            Não tem uma conta?{' '}
             <Link to="/signup" className="text-primary hover:underline">
-              Sign up
+              Criar conta
             </Link>
           </p>
           <p>
             <Link to="/" className="hover:underline">
-              ← Back to Home
+              ← Voltar para Início
             </Link>
           </p>
         </div>
