@@ -12,7 +12,7 @@ import { createSupabaseClient, type Env } from '~/lib/supabase.server';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card';
-import { LogIn, AlertCircle, Loader2 } from 'lucide-react';
+import { LogIn, AlertCircle, Loader2, Eye, EyeOff } from 'lucide-react';
 import { t } from '~/lib/i18n';
 
 export const meta: MetaFunction = () => {
@@ -246,19 +246,21 @@ export default function LoginPage() {
                     autoComplete="current-password"
                     required
                     placeholder="••••••••"
-                    className="h-11 pr-20"
+                    className="h-11 pr-12"
                   />
-                  <button
+                  <Button
                     type="button"
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      setShowPassword(!showPassword);
-                    }}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer px-2 py-1.5 rounded hover:bg-muted/50 select-none"
-                    tabIndex={-1}
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-0 top-0 h-11 px-3 hover:bg-transparent"
                   >
-                    {showPassword ? 'Ocultar' : 'Mostrar'}
-                  </button>
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4 text-muted-foreground" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-muted-foreground" />
+                    )}
+                  </Button>
                 </div>
               </div>
 
