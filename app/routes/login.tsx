@@ -239,28 +239,29 @@ export default function LoginPage() {
                   Senha
                 </label>
                 <div className="relative">
-                  <Input
+                  <input
                     id="password"
                     name="password"
                     type={showPassword ? 'text' : 'password'}
                     autoComplete="current-password"
                     required
                     placeholder="••••••••"
-                    className="h-11 pr-12"
+                    className="flex h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pr-12"
                   />
-                  <Button
+                  <button
                     type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-0 top-0 h-11 px-3 hover:bg-transparent"
+                    onClick={() => {
+                      console.log('Button clicked!', showPassword);
+                      setShowPassword(!showPassword);
+                    }}
+                    className="absolute right-0 top-0 h-11 px-3 flex items-center justify-center hover:bg-transparent"
                   >
                     {showPassword ? (
                       <EyeOff className="h-4 w-4 text-muted-foreground" />
                     ) : (
                       <Eye className="h-4 w-4 text-muted-foreground" />
                     )}
-                  </Button>
+                  </button>
                 </div>
               </div>
 
