@@ -3,7 +3,7 @@
  * Allows new staff members to create an account
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { MetaFunction, ActionFunctionArgs } from '@remix-run/cloudflare';
 import { json } from '@remix-run/cloudflare';
 import { useActionData, useNavigation, Form, Link } from '@remix-run/react';
@@ -210,6 +210,11 @@ export default function SignupPage() {
   const navigation = useNavigation();
   const isSubmitting = navigation.state === 'submitting';
   const [showPassword, setShowPassword] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 flex items-center justify-center p-4">
@@ -292,21 +297,27 @@ export default function SignupPage() {
                       <Input
                         id="password"
                         name="password"
-                        type={showPassword ? 'text' : 'password'}
+                        type={mounted && showPassword ? 'text' : 'password'}
                         autoComplete="new-password"
                         required
                         minLength={6}
                         placeholder="••••••••"
                         className="h-11 pr-20"
                       />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground hover:text-foreground transition-colors z-10 cursor-pointer px-1 py-1"
-                        tabIndex={-1}
-                      >
-                        {showPassword ? 'Ocultar' : 'Mostrar'}
-                      </button>
+                      {mounted && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setShowPassword(!showPassword);
+                          }}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground hover:text-foreground transition-colors z-10 cursor-pointer px-2 py-1.5 rounded hover:bg-muted/50"
+                          tabIndex={-1}
+                        >
+                          {showPassword ? 'Ocultar' : 'Mostrar'}
+                        </button>
+                      )}
                     </div>
                   </div>
 
@@ -318,25 +329,27 @@ export default function SignupPage() {
                       <Input
                         id="confirmPassword"
                         name="confirmPassword"
-                        type={showPassword ? 'text' : 'password'}
+                        type={mounted && showPassword ? 'text' : 'password'}
                         autoComplete="new-password"
                         required
                         minLength={6}
                         placeholder="••••••••"
                         className="h-11 pr-20"
                       />
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          setShowPassword(!showPassword);
-                        }}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground hover:text-foreground transition-colors z-10 cursor-pointer px-2 py-1.5 rounded hover:bg-muted/50"
-                        tabIndex={-1}
-                      >
-                        {showPassword ? 'Ocultar' : 'Mostrar'}
-                      </button>
+                      {mounted && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setShowPassword(!showPassword);
+                          }}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground hover:text-foreground transition-colors z-10 cursor-pointer px-2 py-1.5 rounded hover:bg-muted/50"
+                          tabIndex={-1}
+                        >
+                          {showPassword ? 'Ocultar' : 'Mostrar'}
+                        </button>
+                      )}
                     </div>
                   </div>
 
