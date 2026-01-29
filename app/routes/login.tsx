@@ -29,6 +29,7 @@ interface ActionData {
     access_token: string;
     refresh_token: string;
   };
+  redirectTo?: string;
 }
 
 export async function action({ request, context }: ActionFunctionArgs) {
@@ -101,12 +102,19 @@ export async function action({ request, context }: ActionFunctionArgs) {
     return json<ActionData>({ error: 'Falha na autenticação' }, { status: 401 });
   }
 
+  // Determine redirect path based on user role and tenant count
+  const redirectTo = await (async () => {
+    const { getPostAuthRedirect } = await import('~/lib/auth.server');
+    return getPostAuthRedirect(supabase, data.user!.id, data.user!.email || '');
+  })();
+
   return json<ActionData>({
     success: true,
     session: {
       access_token: data.session.access_token,
       refresh_token: data.session.refresh_token,
     },
+    redirectTo,
   });
 }
 
@@ -157,10 +165,10 @@ export default function LoginPage() {
         // Import storeTokens from auth.ts
         const { storeTokens } = await import('~/lib/auth');
         storeTokens(actionData.session.access_token, actionData.session.refresh_token);
-        console.log('Tokens stored, redirecting to /backoffice...');
+        console.log('Tokens stored, redirecting to:', actionData.redirectTo || '/backoffice');
         // Small delay to ensure localStorage is written
         setTimeout(() => {
-          window.location.href = '/backoffice';
+          window.location.href = actionData.redirectTo || '/backoffice';
         }, 100);
       };
       handleLogin();
@@ -242,8 +250,12 @@ export default function LoginPage() {
                   />
                   <button
                     type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground hover:text-foreground transition-colors z-10 cursor-pointer px-1 py-1"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setShowPassword(!showPassword);
+                    }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground hover:text-foreground transition-colors z-10 cursor-pointer px-2 py-1.5 rounded hover:bg-muted/50"
                     tabIndex={-1}
                   >
                     {showPassword ? 'Ocultar' : 'Mostrar'}
