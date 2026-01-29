@@ -250,12 +250,11 @@ export default function LoginPage() {
                   />
                   <button
                     type="button"
-                    onClick={(e) => {
+                    onMouseDown={(e) => {
                       e.preventDefault();
-                      e.stopPropagation();
                       setShowPassword(!showPassword);
                     }}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground hover:text-foreground transition-colors z-10 cursor-pointer px-2 py-1.5 rounded hover:bg-muted/50"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer px-2 py-1.5 rounded hover:bg-muted/50 select-none"
                     tabIndex={-1}
                   >
                     {showPassword ? 'Ocultar' : 'Mostrar'}
