@@ -11,7 +11,7 @@ import { createSupabaseClient, type Env } from '~/lib/supabase.server';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card';
-import { UserPlus, AlertCircle, Loader2, CheckCircle, Eye, EyeOff } from 'lucide-react';
+import { UserPlus, AlertCircle, Loader2, CheckCircle } from 'lucide-react';
 
 export const meta: MetaFunction = () => {
   return [
@@ -288,62 +288,41 @@ export default function SignupPage() {
                     <label htmlFor="password" className="block text-sm font-medium mb-1.5">
                       Senha
                     </label>
-                    <div className="relative">
-                      <Input
-                        id="password"
-                        name="password"
-                        type={showPassword ? 'text' : 'password'}
-                        autoComplete="new-password"
-                        required
-                        minLength={6}
-                        placeholder="••••••••"
-                        className="h-11 pr-12"
+                    <Input
+                      id="password"
+                      name="password"
+                      type={showPassword ? 'text' : 'password'}
+                      autoComplete="new-password"
+                      required
+                      minLength={6}
+                      placeholder="••••••••"
+                      className="h-11"
+                    />
+                    <label className="flex items-center mt-2 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={showPassword}
+                        onChange={(e) => setShowPassword(e.target.checked)}
+                        className="mr-2 h-4 w-4 cursor-pointer"
                       />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-0 top-0 h-11 px-3 hover:bg-transparent"
-                      >
-                        {showPassword ? (
-                          <EyeOff className="h-4 w-4 text-muted-foreground" />
-                        ) : (
-                          <Eye className="h-4 w-4 text-muted-foreground" />
-                        )}
-                      </Button>
-                    </div>
+                      <span className="text-sm text-muted-foreground">Mostrar senha</span>
+                    </label>
                   </div>
 
                   <div>
                     <label htmlFor="confirmPassword" className="block text-sm font-medium mb-1.5">
                       Confirmar Senha
                     </label>
-                    <div className="relative">
-                      <Input
-                        id="confirmPassword"
-                        name="confirmPassword"
-                        type={showPassword ? 'text' : 'password'}
-                        autoComplete="new-password"
-                        required
-                        minLength={6}
-                        placeholder="••••••••"
-                        className="h-11 pr-12"
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-0 top-0 h-11 px-3 hover:bg-transparent"
-                      >
-                        {showPassword ? (
-                          <EyeOff className="h-4 w-4 text-muted-foreground" />
-                        ) : (
-                          <Eye className="h-4 w-4 text-muted-foreground" />
-                        )}
-                      </Button>
-                    </div>
+                    <Input
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      type={showPassword ? 'text' : 'password'}
+                      autoComplete="new-password"
+                      required
+                      minLength={6}
+                      placeholder="••••••••"
+                      className="h-11"
+                    />
                   </div>
 
                   <Button type="submit" disabled={isSubmitting} className="w-full h-11">

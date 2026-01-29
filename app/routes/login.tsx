@@ -12,7 +12,7 @@ import { createSupabaseClient, type Env } from '~/lib/supabase.server';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card';
-import { LogIn, AlertCircle, Loader2, Eye, EyeOff } from 'lucide-react';
+import { LogIn, AlertCircle, Loader2 } from 'lucide-react';
 import { t } from '~/lib/i18n';
 
 export const meta: MetaFunction = () => {
@@ -238,31 +238,24 @@ export default function LoginPage() {
                 <label htmlFor="password" className="block text-sm font-medium mb-1.5">
                   Senha
                 </label>
-                <div className="relative">
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="current-password"
+                  required
+                  placeholder="••••••••"
+                  className="flex h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                />
+                <label className="flex items-center mt-2 cursor-pointer select-none">
                   <input
-                    id="password"
-                    name="password"
-                    type={showPassword ? 'text' : 'password'}
-                    autoComplete="current-password"
-                    required
-                    placeholder="••••••••"
-                    className="flex h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pr-12"
+                    type="checkbox"
+                    checked={showPassword}
+                    onChange={(e) => setShowPassword(e.target.checked)}
+                    className="mr-2 h-4 w-4 cursor-pointer"
                   />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      console.log('Button clicked!', showPassword);
-                      setShowPassword(!showPassword);
-                    }}
-                    className="absolute right-0 top-0 h-11 px-3 flex items-center justify-center hover:bg-transparent"
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4 text-muted-foreground" />
-                    ) : (
-                      <Eye className="h-4 w-4 text-muted-foreground" />
-                    )}
-                  </button>
-                </div>
+                  <span className="text-sm text-muted-foreground">Mostrar senha</span>
+                </label>
               </div>
 
               <Button type="submit" disabled={isSubmitting} className="w-full h-11">
