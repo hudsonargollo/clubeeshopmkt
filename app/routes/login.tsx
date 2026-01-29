@@ -156,11 +156,6 @@ export default function LoginPage() {
   const navigation = useNavigation();
   const isSubmitting = navigation.state === 'submitting';
   const [showPassword, setShowPassword] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   // If login successful, store token and redirect
   useEffect(() => {
@@ -247,26 +242,24 @@ export default function LoginPage() {
                   <Input
                     id="password"
                     name="password"
-                    type={mounted && showPassword ? 'text' : 'password'}
+                    type={showPassword ? 'text' : 'password'}
                     autoComplete="current-password"
                     required
                     placeholder="••••••••"
                     className="h-11 pr-20"
                   />
-                  {mounted && (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setShowPassword(!showPassword);
-                      }}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground hover:text-foreground transition-colors z-10 cursor-pointer px-2 py-1.5 rounded hover:bg-muted/50"
-                      tabIndex={-1}
-                    >
-                      {showPassword ? 'Ocultar' : 'Mostrar'}
-                    </button>
-                  )}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setShowPassword(!showPassword);
+                    }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground hover:text-foreground transition-colors z-10 cursor-pointer px-2 py-1.5 rounded hover:bg-muted/50"
+                    tabIndex={-1}
+                  >
+                    {showPassword ? 'Ocultar' : 'Mostrar'}
+                  </button>
                 </div>
               </div>
 
