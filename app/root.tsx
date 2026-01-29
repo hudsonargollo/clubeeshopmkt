@@ -38,8 +38,6 @@ export const meta: MetaFunction = () => {
 export const links: LinksFunction = () => [
   // Preconnect to Supabase for faster API calls
   { rel: "preconnect", href: "https://supabase.co" },
-  // PWA manifest (if exists)
-  { rel: "manifest", href: "/manifest.json" },
   // Favicon
   { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
 ];
