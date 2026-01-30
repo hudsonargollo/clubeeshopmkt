@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript Test</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-box {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        button:hover {
+            background: #0052a3;
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 JavaScript Test Page</h1>
+    <p>This is a simple HTML page to test if JavaScript works in your browser.</p>
+
+    <div class="test-box">
+        <h2>Test 1: Page Load</h2>
+        <p id="load-test" class="error">❌ JavaScript NOT loaded</p>
+    </div>
+
+    <div class="test-box">
+        <h2>Test 2: Button Click</h2>
+        <button onclick="testButton()">Click Me!</button>
+        <p id="button-result"></p>
+    </div>
+
+    <div class="test-box">
+        <h2>Test 3: Checkbox</h2>
+        <label style="display: flex; align-items: center; cursor: pointer;">
+            <input type="checkbox" id="test-checkbox" onchange="testCheckbox()">
+            <span style="margin-left: 10px;">Click this checkbox</span>
+        </label>
+        <p id="checkbox-result"></p>
+    </div>
+
+    <div class="test-box">
+        <h2>Test 4: Form Submit</h2>
+        <form onsubmit="testForm(event)">
+            <input type="text" placeholder="Type anything" required style="padding: 8px; width: 100%; margin-bottom: 10px;">
+            <button type="submit">Submit Form</button>
+        </form>
+        <p id="form-result"></p>
+    </div>
+
+    <div class="test-box" style="background: #fffbea; border-left: 4px solid #f59e0b;">
+        <h3>📋 Instructions:</h3>
+        <ol>
+            <li>If "Test 1" shows green checkmark, JavaScript is working</li>
+            <li>Try clicking the button in Test 2</li>
+            <li>Try checking the checkbox in Test 3</li>
+            <li>Try submitting the form in Test 4</li>
+        </ol>
+        <p style="margin-top: 20px;">
+            <strong>If ALL tests pass:</strong> JavaScript works, the issue is with the React app.<br>
+            <strong>If tests FAIL:</strong> JavaScript is blocked or cached.
+        </p>
+        <p style="margin-top: 10px; font-size: 14px; color: #666;">
+            URL: <code>https://clubeeshopmkt.hudsonargollo2.workers.dev/test.html</code>
+        </p>
+    </div>
+
+    <script>
+        // Test 1: Page load
+        document.getElementById('load-test').innerHTML = '✅ JavaScript IS working!';
+        document.getElementById('load-test').className = 'success';
+
+        // Test 2: Button click
+        let clickCount = 0;
+        function testButton() {
+            clickCount++;
+            document.getElementById('button-result').innerHTML = 
+                `<span class="success">✅ Button clicked ${clickCount} time(s)!</span>`;
+        }
+
+        // Test 3: Checkbox
+        function testCheckbox() {
+            const checkbox = document.getElementById('test-checkbox');
+            const result = document.getElementById('checkbox-result');
+            if (checkbox.checked) {
+                result.innerHTML = '<span class="success">✅ Checkbox is CHECKED</span>';
+            } else {
+                result.innerHTML = '<span class="success">✅ Checkbox is UNCHECKED</span>';
+            }
+        }
+
+        // Test 4: Form submit
+        function testForm(event) {
+            event.preventDefault();
+            document.getElementById('form-result').innerHTML = 
+                '<span class="success">✅ Form submitted successfully!</span>';
+            alert('Form submission works!');
+            return false;
+        }
+
+        console.log('✅ JavaScript console is working!');
+        console.log('If you can see this message, JavaScript is executing properly.');
+    </script>
+</body>
+</html>
