@@ -298,8 +298,9 @@ export default function SignupPage() {
                       placeholder="••••••••"
                       className="h-11"
                     />
-                    <label className="flex items-center mt-2 cursor-pointer select-none">
+                    <label htmlFor="show-password" className="flex items-center mt-2 cursor-pointer select-none">
                       <input
+                        id="show-password"
                         type="checkbox"
                         checked={showPassword}
                         onChange={(e) => setShowPassword(e.target.checked)}
