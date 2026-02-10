@@ -1,0 +1,10 @@
+HTTP/2 302 
+date: Sun, 08 Feb 2026 01:39:25 GMT
+content-length: 0
+location: https://zalerisusobjckaodkfb.supabase.co/auth/v1/authorize?provider=google&redirect_to=https%3A%2F%2Fclubeeshopmkt.hudsonargollo2.workers.dev%2Fauth%2Fcallback
+report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=EJ0pBXZ50EUV6fhQ6TTISGvLKiWBsyCYpQzVopfM0%2FfSxmQks6DTE%2FB4gYKHdkJSQQjvtzlqRR9HUubzXcisoALVHdx9bDcWCUUXmTA2zlJIux%2F1x4Gb1k847g2iQHddRDA49tG8ZGU6hXfL8uAo6dW3k0s%3D"}]}
+nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+server: cloudflare
+cf-ray: 9ca769c1be84d8cb-GRU
+alt-svc: h3=":443"; ma=86400
+

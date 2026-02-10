@@ -4,16 +4,16 @@
  * Requirements: 3.2, 3.3, 3.4, 3.5, 11.2
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import type { MetaFunction, ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/cloudflare';
 import { json, redirect } from '@remix-run/cloudflare';
-import { useActionData, useNavigation, Form, useLoaderData } from '@remix-run/react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useActionData, useNavigation, Form, useLoaderData, useFetcher } from '@remix-run/react';
 import { createSupabaseClient, type Env } from '~/lib/supabase.server';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card';
-import { Store, Loader2, AlertCircle, CheckCircle, Globe } from 'lucide-react';
+import { ClientOnly } from '~/components/ui/ClientOnly';
+import { Store, AlertCircle, Globe } from 'lucide-react';
 
 export const meta: MetaFunction = () => {
   return [
@@ -83,16 +83,44 @@ export async function action({ request, context }: ActionFunctionArgs) {
 
   // Get auth header from request
   const authHeader = request.headers.get('Authorization');
-  const supabase = createSupabaseClient(env, authHeader);
-
-  // Get current user
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
   
-  if (userError || !user) {
-    return json<ActionData>({ error: 'Faça login para continuar' }, { status: 401 });
+  console.log('Onboarding - Auth header present:', !!authHeader);
+  console.log('Onboarding - Auth header length:', authHeader?.length || 0);
+  
+  if (!authHeader) {
+    console.error('Onboarding auth error: No Authorization header provided');
+    return json<ActionData>({ error: 'Sua sessão expirou. Faça login novamente.' }, { status: 401 });
   }
 
-  // Check subdomain uniqueness
+  // Create Supabase client with the provided token
+  const supabase = createSupabaseClient(env, authHeader);
+
+  // Try to get user from the token
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  
+  console.log('Onboarding - User validation result:', {
+    hasUser: !!user,
+    userId: user?.id,
+    userEmail: user?.email,
+    error: userError?.message
+  });
+  
+  if (userError || !user) {
+    console.error('Onboarding auth error:', userError);
+    
+    // If token validation fails, try to refresh it or provide more specific error
+    if (userError?.message?.includes('invalid') || userError?.message?.includes('expired')) {
+      return json<ActionData>({ 
+        error: 'Sua sessão expirou. Faça login novamente.' 
+      }, { status: 401 });
+    }
+    
+    return json<ActionData>({ 
+      error: 'Erro de autenticação. Tente fazer login novamente.' 
+    }, { status: 401 });
+  }
+
+  // Check subdomain uniqueness first
   const { data: existingTenant } = await supabase
     .from('tenants')
     .select('id')
@@ -121,8 +149,27 @@ export async function action({ request, context }: ActionFunctionArgs) {
     return json<ActionData>({ error: 'Falha ao criar loja. Tente novamente.' }, { status: 500 });
   }
 
-  // Create user_tenant record with 'owner' role
-  const { error: userTenantError } = await supabase
+  // Create service role client for user_tenant creation
+  let supabaseAdmin;
+  try {
+    supabaseAdmin = createSupabaseClient(env, null, true); // Use service role
+  } catch (error) {
+    console.error('Service role client creation failed:', error);
+    return json<ActionData>({ 
+      error: 'Configuração do servidor incompleta. O administrador precisa configurar a chave de serviço.' 
+    }, { status: 500 });
+  }
+
+  // Check if service role key is available
+  if (!env.SUPABASE_SERVICE_ROLE_KEY) {
+    console.error('SUPABASE_SERVICE_ROLE_KEY not configured');
+    return json<ActionData>({ 
+      error: 'Configuração do servidor incompleta. Entre em contato com o suporte técnico.' 
+    }, { status: 500 });
+  }
+
+  // Create user_tenant relationship with service role
+  const { error: userTenantError } = await supabaseAdmin
     .from('user_tenants')
     .insert({
       user_id: user.id,
@@ -132,16 +179,18 @@ export async function action({ request, context }: ActionFunctionArgs) {
 
   if (userTenantError) {
     console.error('User tenant creation error:', userTenantError);
-    // Rollback tenant creation
+    
+    // Clean up tenant if user_tenant creation failed
     await supabase.from('tenants').delete().eq('id', tenant.id);
-    return json<ActionData>({ error: 'Falha ao configurar propriedade da loja. Tente novamente.' }, { status: 500 });
+    
+    return json<ActionData>({ 
+      error: `Falha ao configurar propriedade da loja: ${userTenantError.message}` 
+    }, { status: 500 });
   }
 
-  // Refresh the user's JWT to include the new tenant_id
-  // This is handled by the database trigger, but we need to refresh the session
-  await supabase.rpc('refresh_user_tenant_claim', { p_user_id: user.id });
+  console.log('Onboarding successful for user:', user.id, 'tenant:', tenant.id);
 
-  return redirect('/backoffice');
+  return json<ActionData>({ success: true });
 }
 
 /**
@@ -157,113 +206,118 @@ function generateSlug(name: string): string {
 }
 
 export default function OnboardingPage() {
+  console.log('OnboardingPage component loaded');
+  
   const { baseDomain } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const navigation = useNavigation();
-  const isSubmitting = navigation.state === 'submitting';
-
+  const fetcher = useFetcher<typeof action>();
+  
   const [shopName, setShopName] = useState('');
   const [subdomain, setSubdomain] = useState('');
-  const [subdomainTouched, setSubdomainTouched] = useState(false);
-  const [isCheckingSubdomain, setIsCheckingSubdomain] = useState(false);
-  const [subdomainAvailable, setSubdomainAvailable] = useState<boolean | null>(null);
 
-  // Auto-generate subdomain from shop name if not manually edited
+  const isSubmitting = navigation.state === 'submitting' || fetcher.state === 'submitting';
+
+  console.log('Component state:', { shopName, subdomain, isSubmitting });
+
+  // Handle successful form submission
   useEffect(() => {
-    if (!subdomainTouched && shopName) {
+    if (fetcher.data?.success) {
+      window.location.href = '/backoffice';
+    }
+  }, [fetcher.data]);
+
+  // Auto-generate subdomain from shop name
+  useEffect(() => {
+    if (shopName) {
       setSubdomain(generateSlug(shopName));
     }
-  }, [shopName, subdomainTouched]);
+  }, [shopName]);
 
-  // Real-time subdomain validation (debounced)
-  const checkSubdomainAvailability = useCallback(async (value: string) => {
-    if (!value || value.length < 3) {
-      setSubdomainAvailable(null);
+  // Handle form submission with proper Authorization header
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    console.log('handleSubmit called!');
+    e.preventDefault();
+    
+    const accessToken = localStorage.getItem('sb-access-token');
+    console.log('Access token found:', accessToken ? 'Yes' : 'No');
+    console.log('Access token length:', accessToken?.length || 0);
+    
+    if (!accessToken) {
+      console.log('No access token, redirecting to home');
+      alert('Nenhum token de acesso encontrado. Por favor, faça login novamente.');
+      window.location.href = '/';
       return;
     }
 
-    setIsCheckingSubdomain(true);
+    // Try to decode token to check if it's valid
     try {
-      const response = await fetch(`/api/check-subdomain?subdomain=${encodeURIComponent(value)}`);
-      const data = await response.json() as { available: boolean };
-      setSubdomainAvailable(data.available);
-    } catch {
-      setSubdomainAvailable(null);
-    } finally {
-      setIsCheckingSubdomain(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (subdomain && subdomain.length >= 3) {
-        checkSubdomainAvailability(subdomain);
+      const payload = accessToken.split('.')[1];
+      const decodedToken = JSON.parse(atob(payload));
+      const isExpired = Date.now() / 1000 > decodedToken.exp;
+      
+      console.log('Token info:', {
+        userId: decodedToken.sub,
+        email: decodedToken.email,
+        isExpired,
+        expiresAt: new Date(decodedToken.exp * 1000).toISOString(),
+      });
+      
+      if (isExpired) {
+        console.log('Token is expired, redirecting to home');
+        alert('Seu token de acesso expirou. Por favor, faça login novamente.');
+        localStorage.removeItem('sb-access-token');
+        localStorage.removeItem('sb-refresh-token');
+        window.location.href = '/';
+        return;
       }
-    }, 500); // 500ms debounce for real-time validation (Requirement 11.2)
+    } catch (error) {
+      console.error('Error decoding token:', error);
+      alert('Token de acesso inválido. Por favor, faça login novamente.');
+      localStorage.removeItem('sb-access-token');
+      localStorage.removeItem('sb-refresh-token');
+      window.location.href = '/';
+      return;
+    }
 
-    return () => clearTimeout(timer);
-  }, [subdomain, checkSubdomainAvailability]);
-
-  const handleSubdomainChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '');
-    setSubdomain(value);
-    setSubdomainTouched(true);
-    setSubdomainAvailable(null);
+    const formData = new FormData(e.currentTarget);
+    console.log('Submitting onboarding form...');
+    console.log('Form data:', Object.fromEntries(formData.entries()));
+    
+    // Add a small delay to ensure any pending token storage operations complete
+    setTimeout(() => {
+      fetcher.submit(formData, {
+        method: 'post',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      });
+    }, 50);
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 flex items-center justify-center p-4">
-      {/* Background decoration */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-400/20 rounded-full blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-400/20 rounded-full blur-3xl" />
-      </div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: 'easeOut' }}
-        className="w-full max-w-md relative z-10"
-      >
-        {/* Glassmorphism Card */}
+      <div className="w-full max-w-md relative z-10">
         <Card className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-2xl">
           <CardHeader className="text-center pb-2">
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-              className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 mx-auto mb-4"
-            >
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 mx-auto mb-4">
               <Store className="h-8 w-8 text-white" />
-            </motion.div>
+            </div>
             <CardTitle className="text-2xl">Crie Sua Loja</CardTitle>
             <CardDescription>
               Configure sua loja online em segundos
             </CardDescription>
           </CardHeader>
-
           <CardContent>
-            <Form method="post" className="space-y-6">
-              <AnimatePresence mode="wait">
-                {actionData?.error && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="flex items-center gap-2 p-3 bg-destructive/10 text-destructive rounded-lg text-sm"
-                  >
-                    <AlertCircle className="h-4 w-4 flex-shrink-0" />
-                    <span>{actionData.error}</span>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {/* Shop Name Field */}
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3 }}
-              >
+            <form onSubmit={handleSubmit} method="post" className="space-y-6">
+              {(actionData?.error || fetcher.data?.error) && (
+                <div className="flex items-center gap-2 p-3 bg-red-50 text-red-700 rounded-lg text-sm">
+                  <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                  <span>{actionData?.error || fetcher.data?.error}</span>
+                </div>
+              )}
+              
+              <div>
                 <label htmlFor="shopName" className="block text-sm font-medium mb-2">
                   Nome da Loja
                 </label>
@@ -278,115 +332,55 @@ export default function OnboardingPage() {
                   minLength={2}
                   maxLength={50}
                   className="h-11"
-                  aria-describedby={actionData?.fieldErrors?.shopName ? 'shopName-error' : undefined}
                 />
-                {actionData?.fieldErrors?.shopName && (
-                  <p id="shopName-error" className="text-sm text-destructive mt-1">
-                    {actionData.fieldErrors.shopName}
+                {(actionData?.fieldErrors?.shopName || fetcher.data?.fieldErrors?.shopName) && (
+                  <p className="text-sm text-red-600 mt-1">
+                    {actionData?.fieldErrors?.shopName || fetcher.data?.fieldErrors?.shopName}
                   </p>
                 )}
-              </motion.div>
-
-              {/* Subdomain Field */}
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.4 }}
-              >
+              </div>
+              
+              <div>
                 <label htmlFor="subdomain" className="block text-sm font-medium mb-2">
                   Subdomínio
                 </label>
-                <div className="relative">
-                  <Input
-                    id="subdomain"
-                    name="subdomain"
-                    type="text"
-                    value={subdomain}
-                    onChange={handleSubdomainChange}
-                    placeholder="minhaloja"
-                    required
-                    minLength={3}
-                    maxLength={30}
-                    className="h-11 pr-10"
-                    aria-describedby="subdomain-preview subdomain-error"
-                  />
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                    {isCheckingSubdomain && (
-                      <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-                    )}
-                    {!isCheckingSubdomain && subdomainAvailable === true && (
-                      <CheckCircle className="h-4 w-4 text-green-500" />
-                    )}
-                    {!isCheckingSubdomain && subdomainAvailable === false && (
-                      <AlertCircle className="h-4 w-4 text-destructive" />
-                    )}
-                  </div>
-                </div>
-                
-                {/* Subdomain Preview */}
-                <div
-                  id="subdomain-preview"
-                  className="flex items-center gap-1.5 mt-2 text-sm text-muted-foreground"
-                >
+                <Input
+                  id="subdomain"
+                  name="subdomain"
+                  type="text"
+                  value={subdomain}
+                  onChange={(e) => setSubdomain(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
+                  placeholder="minhaloja"
+                  required
+                  minLength={3}
+                  maxLength={30}
+                  className="h-11"
+                />
+                <div className="flex items-center gap-1.5 mt-2 text-sm text-gray-600">
                   <Globe className="h-3.5 w-3.5" />
-                  <span>
-                    {subdomain || 'sualoja'}.{baseDomain}
-                  </span>
+                  <span>{subdomain || 'sualoja'}.{baseDomain}</span>
                 </div>
-
-                {/* Subdomain Errors */}
-                {actionData?.fieldErrors?.subdomain && (
-                  <p id="subdomain-error" className="text-sm text-destructive mt-1">
-                    {actionData.fieldErrors.subdomain}
+                {(actionData?.fieldErrors?.subdomain || fetcher.data?.fieldErrors?.subdomain) && (
+                  <p className="text-sm text-red-600 mt-1">
+                    {actionData?.fieldErrors?.subdomain || fetcher.data?.fieldErrors?.subdomain}
                   </p>
                 )}
-                {!isCheckingSubdomain && subdomainAvailable === false && !actionData?.fieldErrors?.subdomain && (
-                  <p className="text-sm text-destructive mt-1">
-                    Este subdomínio já está em uso
-                  </p>
-                )}
-              </motion.div>
-
-              {/* Submit Button */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
+              </div>
+              
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full h-11 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-medium"
               >
-                <Button
-                  type="submit"
-                  disabled={isSubmitting || subdomainAvailable === false}
-                  className="w-full h-11 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-medium"
-                >
-                  <motion.span
-                    whileTap={{ scale: 0.95 }}
-                    className="flex items-center justify-center gap-2"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Criando sua loja...
-                      </>
-                    ) : (
-                      'Criar Loja'
-                    )}
-                  </motion.span>
-                </Button>
-              </motion.div>
-            </Form>
+                {isSubmitting ? 'Criando sua loja...' : 'Criar Loja'}
+              </Button>
+            </form>
           </CardContent>
         </Card>
-
-        {/* Progress indicator */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
-          className="text-center text-sm text-muted-foreground mt-4"
-        >
+        <p className="text-center text-sm text-gray-600 mt-4">
           Passo 1 de 1 • Você estará pronto em segundos
-        </motion.p>
-      </motion.div>
+        </p>
+      </div>
     </div>
   );
 }

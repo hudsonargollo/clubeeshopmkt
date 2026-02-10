@@ -7,6 +7,8 @@ import { createClient, SupabaseClient } from "@supabase/supabase-js";
 export interface Env {
   SUPABASE_URL: string;
   SUPABASE_ANON_KEY: string;
+  // Service role key for admin operations (onboarding, user management)
+  SUPABASE_SERVICE_ROLE_KEY?: string;
   // JWT secret for edge validation (Requirements: 13.3, 13.4)
   SUPABASE_JWT_SECRET?: string;
   // Hyperdrive binding for connection pooling (configured in wrangler.toml)
@@ -78,14 +80,18 @@ export function validateEnvironment(env: Partial<Env>): ValidationResult {
  * 
  * @param env - Cloudflare Worker environment bindings
  * @param authHeader - Optional Authorization header for authenticated requests
+ * @param useServiceRole - Whether to use service role for admin operations
  * @returns Configured Supabase client
  */
 export function createSupabaseClient(
   env: Env,
-  authHeader?: string | null
+  authHeader?: string | null,
+  useServiceRole: boolean = false
 ): SupabaseClient {
   const supabaseUrl = env.SUPABASE_URL;
-  const supabaseKey = env.SUPABASE_ANON_KEY;
+  const supabaseKey = useServiceRole && env.SUPABASE_SERVICE_ROLE_KEY 
+    ? env.SUPABASE_SERVICE_ROLE_KEY 
+    : env.SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseKey) {
     throw new Error(

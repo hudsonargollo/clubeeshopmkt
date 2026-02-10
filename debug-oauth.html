@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OAuth Debug Test</title>
+</head>
+<body>
+    <h1>OAuth Debug Test</h1>
+    <p>Click the button below to test Google OAuth signup:</p>
+    
+    <form action="https://clubeeshopmkt.hudsonargollo2.workers.dev/signup" method="post">
+        <input type="hidden" name="action" value="google" />
+        <button type="submit">Test Google OAuth Signup</button>
+    </form>
+    
+    <br><br>
+    
+    <form action="https://clubeeshopmkt.hudsonargollo2.workers.dev/login" method="post">
+        <input type="hidden" name="action" value="google" />
+        <button type="submit">Test Google OAuth Login</button>
+    </form>
+    
+    <h2>Debug Info</h2>
+    <p>Current URL: <span id="current-url"></span></p>
+    <p>URL Parameters:</p>
+    <ul id="url-params"></ul>
+    
+    <script>
+        document.getElementById('current-url').textContent = window.location.href;
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const paramsList = document.getElementById('url-params');
+        
+        if (urlParams.toString()) {
+            for (const [key, value] of urlParams) {
+                const li = document.createElement('li');
+                li.textContent = `${key}: ${value}`;
+                paramsList.appendChild(li);
+            }
+        } else {
+            const li = document.createElement('li');
+            li.textContent = 'No URL parameters found';
+            paramsList.appendChild(li);
+        }
+    </script>
+</body>
+</html>

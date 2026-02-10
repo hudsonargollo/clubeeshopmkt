@@ -57,48 +57,28 @@ export async function action({ request, context }: ActionFunctionArgs) {
     if (action === 'google') {
       console.log('Signup action - Initiating Google OAuth');
       
-      try {
-        const { data, error } = await supabase.auth.signInWithOAuth({
-          provider: 'google',
-          options: {
-            redirectTo: `${new URL(request.url).origin}/auth/callback`,
-          },
-        });
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${new URL(request.url).origin}/auth/callback`,
+        },
+      });
 
-        if (error) {
-          console.error('Google OAuth error:', error);
-          
-          // Check if it's a configuration error
-          if (error.message.includes('Provider') || error.message.includes('not configured')) {
-            return json<ActionData>({ 
-              error: 'O cadastro com Google ainda não está configurado. Use e-mail/senha por enquanto.' 
-            }, { status: 400 });
-          }
-          
-          return json<ActionData>({ 
-            error: `Falha no cadastro com Google: ${error.message}` 
-          }, { status: 400 });
-        }
-
-        if (data.url) {
-          console.log('Signup action - Redirecting to Google OAuth URL');
-          // Redirect to Google OAuth
-          throw new Response(null, {
-            status: 302,
-            headers: { Location: data.url },
-          });
-        }
-
-        console.error('No OAuth URL returned from Supabase');
-        return json<ActionData>({ 
-          error: 'O cadastro com Google ainda não está configurado. Use e-mail/senha por enquanto.' 
-        }, { status: 400 });
-      } catch (oauthError) {
-        console.error('OAuth setup error:', oauthError);
-        return json<ActionData>({ 
-          error: 'O cadastro com Google ainda não está configurado. Use e-mail/senha por enquanto.' 
-        }, { status: 400 });
+      if (error) {
+        console.error('Google OAuth error:', error);
+        return json<ActionData>({ error: error.message || 'Falha ao cadastrar com Google' }, { status: 400 });
       }
+
+      if (data.url) {
+        console.log('Signup action - Redirecting to Google OAuth URL');
+        // Redirect to Google OAuth
+        throw new Response(null, {
+          status: 302,
+          headers: { Location: data.url },
+        });
+      }
+
+      return json<ActionData>({ error: 'Falha ao iniciar cadastro com Google' }, { status: 400 });
     }
 
     // Handle email/password signup
@@ -355,6 +335,14 @@ export default function SignupPage() {
               ← Voltar para Início
             </Link>
           </p>
+          <div className="flex items-center justify-center gap-4 pt-2">
+            <Link to="/privacy" className="hover:underline text-xs">
+              Política de Privacidade
+            </Link>
+            <Link to="/terms" className="hover:underline text-xs">
+              Termos de Serviço
+            </Link>
+          </div>
         </div>
       </div>
     </div>

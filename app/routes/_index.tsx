@@ -270,14 +270,26 @@ function CTASection() {
 function Footer() {
   return (
     <footer className="px-4 py-8 border-t border-border/50">
-      <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-2">
-          <Store className="h-5 w-5 text-primary" />
-          <span className="font-semibold">ClubeeShopMkt</span>
+      <div className="max-w-6xl mx-auto">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4">
+          <div className="flex items-center gap-2">
+            <Store className="h-5 w-5 text-primary" />
+            <span className="font-semibold">ClubeeShopMkt</span>
+          </div>
+          <div className="flex items-center gap-6 text-sm">
+            <Link to="/privacy" className="text-muted-foreground hover:text-foreground transition-colors">
+              Política de Privacidade
+            </Link>
+            <Link to="/terms" className="text-muted-foreground hover:text-foreground transition-colors">
+              Termos de Serviço
+            </Link>
+          </div>
         </div>
-        <p className="text-sm text-muted-foreground">
-          © {new Date().getFullYear()} ClubeeShopMkt. Todos os direitos reservados.
-        </p>
+        <div className="text-center">
+          <p className="text-sm text-muted-foreground">
+            © {new Date().getFullYear()} ClubeeShopMkt. Todos os direitos reservados.
+          </p>
+        </div>
       </div>
     </footer>
   );

@@ -286,6 +286,14 @@ export default function LoginPage() {
               ← Voltar para Início
             </Link>
           </p>
+          <div className="flex items-center justify-center gap-4 pt-2">
+            <Link to="/privacy" className="hover:underline text-xs">
+              Política de Privacidade
+            </Link>
+            <Link to="/terms" className="hover:underline text-xs">
+              Termos de Serviço
+            </Link>
+          </div>
         </div>
       </div>
     </div>

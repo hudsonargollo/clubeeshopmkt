@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OAuth Flow Test - ClubeeShopMkt</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .step {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: #fafafa;
+        }
+        .step h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .result {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            border-radius: 3px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .success { border-color: #28a745; background: #d4edda; }
+        .error { border-color: #dc3545; background: #f8d7da; }
+        .warning { border-color: #ffc107; background: #fff3cd; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 OAuth Flow Test</h1>
+        <p>This page tests the complete OAuth authentication flow for ClubeeShopMkt.</p>
+        
+        <div class="step">
+            <h3>Step 1: Test Google OAuth Initiation</h3>
+            <p>Click to start Google OAuth flow (will redirect to Google)</p>
+            <button onclick="startGoogleOAuth()">Start Google OAuth</button>
+            <div id="oauth-result" class="result"></div>
+        </div>
+
+        <div class="step">
+            <h3>Step 2: Test Token Storage</h3>
+            <p>Check if tokens are stored in localStorage after OAuth callback</p>
+            <button onclick="checkTokens()">Check Stored Tokens</button>
+            <button onclick="clearTokens()">Clear Tokens</button>
+            <div id="token-result" class="result"></div>
+        </div>
+
+        <div class="step">
+            <h3>Step 3: Test Token Validation</h3>
+            <p>Test if stored tokens are valid with the server</p>
+            <button onclick="validateTokens()">Validate Tokens</button>
+            <div id="validation-result" class="result"></div>
+        </div>
+
+        <div class="step">
+            <h3>Step 4: Test Onboarding Form</h3>
+            <p>Test onboarding form submission with stored tokens</p>
+            <button onclick="testOnboarding()">Test Onboarding</button>
+            <div id="onboarding-result" class="result"></div>
+        </div>
+
+        <div class="step">
+            <h3>Step 5: Simulate Complete Flow</h3>
+            <p>Simulate the complete OAuth → Onboarding flow</p>
+            <button onclick="simulateCompleteFlow()">Simulate Complete Flow</button>
+            <div id="complete-result" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        const BASE_URL = 'https://eshop.clubemkt.digital';
+        
+        function log(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const logMessage = `[${timestamp}] ${message}\n`;
+            
+            element.textContent += logMessage;
+            element.className = `result ${type}`;
+            element.scrollTop = element.scrollHeight;
+            
+            console.log(`[${elementId}]`, message);
+        }
+
+        function startGoogleOAuth() {
+            log('oauth-result', 'Starting Google OAuth flow...', 'info');
+            
+            // Create a form and submit it to trigger OAuth
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `${BASE_URL}/signup`;
+            
+            const actionInput = document.createElement('input');
+            actionInput.type = 'hidden';
+            actionInput.name = 'action';
+            actionInput.value = 'google';
+            
+            form.appendChild(actionInput);
+            document.body.appendChild(form);
+            
+            log('oauth-result', 'Submitting OAuth form...', 'info');
+            form.submit();
+        }
+
+        function checkTokens() {
+            log('token-result', 'Checking localStorage for tokens...', 'info');
+            
+            const accessToken = localStorage.getItem('sb-access-token');
+            const refreshToken = localStorage.getItem('sb-refresh-token');
+            
+            if (accessToken) {
+                log('token-result', `Access Token: ${accessToken.substring(0, 50)}...`, 'success');
+                log('token-result', `Access Token Length: ${accessToken.length}`, 'info');
+                
+                // Try to decode the token
+                try {
+                    const parts = accessToken.split('.');
+                    if (parts.length === 3) {
+                        const payload = JSON.parse(atob(parts[1]));
+                        log('token-result', `Token User ID: ${payload.sub}`, 'info');
+                        log('token-result', `Token Email: ${payload.email}`, 'info');
+                        log('token-result', `Token Expires: ${new Date(payload.exp * 1000).toISOString()}`, 'info');
+                        log('token-result', `Token Expired: ${Date.now() / 1000 > payload.exp}`, payload.exp < Date.now() / 1000 ? 'error' : 'success');
+                    } else {
+                        log('token-result', 'Invalid JWT format - should have 3 parts', 'error');
+                    }
+                } catch (error) {
+                    log('token-result', `Error decoding token: ${error.message}`, 'error');
+                }
+            } else {
+                log('token-result', 'No access token found', 'warning');
+            }
+            
+            if (refreshToken) {
+                log('token-result', `Refresh Token: ${refreshToken.substring(0, 30)}...`, 'success');
+            } else {
+                log('token-result', 'No refresh token found', 'warning');
+            }
+        }
+
+        function clearTokens() {
+            localStorage.removeItem('sb-access-token');
+            localStorage.removeItem('sb-refresh-token');
+            log('token-result', 'Tokens cleared from localStorage', 'info');
+        }
+
+        async function validateTokens() {
+            log('validation-result', 'Testing token validation with server...', 'info');
+            
+            const accessToken = localStorage.getItem('sb-access-token');
+            
+            if (!accessToken) {
+                log('validation-result', 'No access token to validate', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${BASE_URL}/api/debug-tokens`, {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                log('validation-result', `Server Response (${response.status}):`, response.ok ? 'success' : 'error');
+                log('validation-result', JSON.stringify(data, null, 2), response.ok ? 'success' : 'error');
+                
+                if (data.supabaseUser) {
+                    log('validation-result', 'Token is VALID - User authenticated', 'success');
+                } else if (data.supabaseError) {
+                    log('validation-result', `Token is INVALID: ${data.supabaseError}`, 'error');
+                }
+            } catch (error) {
+                log('validation-result', `Network error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testOnboarding() {
+            log('onboarding-result', 'Testing onboarding form submission...', 'info');
+            
+            const accessToken = localStorage.getItem('sb-access-token');
+            
+            if (!accessToken) {
+                log('onboarding-result', 'No access token for onboarding test', 'error');
+                return;
+            }
+            
+            try {
+                const formData = new FormData();
+                formData.append('shopName', 'Test Shop ' + Date.now());
+                formData.append('subdomain', 'testshop' + Date.now());
+                
+                log('onboarding-result', 'Submitting onboarding form...', 'info');
+                
+                const response = await fetch(`${BASE_URL}/onboarding`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    },
+                    body: formData
+                });
+                
+                const responseText = await response.text();
+                
+                log('onboarding-result', `Onboarding Response (${response.status}):`, response.ok ? 'success' : 'error');
+                
+                try {
+                    const jsonData = JSON.parse(responseText);
+                    log('onboarding-result', JSON.stringify(jsonData, null, 2), response.ok ? 'success' : 'error');
+                } catch (e) {
+                    log('onboarding-result', responseText.substring(0, 500), response.ok ? 'success' : 'error');
+                }
+                
+                if (response.ok) {
+                    log('onboarding-result', 'Onboarding SUCCESS!', 'success');
+                } else {
+                    log('onboarding-result', 'Onboarding FAILED', 'error');
+                }
+            } catch (error) {
+                log('onboarding-result', `Network error: ${error.message}`, 'error');
+            }
+        }
+
+        async function simulateCompleteFlow() {
+            log('complete-result', 'Starting complete flow simulation...', 'info');
+            
+            // Step 1: Check if we have tokens
+            const accessToken = localStorage.getItem('sb-access-token');
+            if (!accessToken) {
+                log('complete-result', 'No tokens found. Please complete OAuth flow first.', 'warning');
+                log('complete-result', 'Click "Start Google OAuth" to begin.', 'info');
+                return;
+            }
+            
+            log('complete-result', 'Step 1: Tokens found ✓', 'success');
+            
+            // Step 2: Validate tokens
+            log('complete-result', 'Step 2: Validating tokens...', 'info');
+            try {
+                const validationResponse = await fetch(`${BASE_URL}/api/debug-tokens`, {
+                    headers: { 'Authorization': `Bearer ${accessToken}` }
+                });
+                const validationData = await validationResponse.json();
+                
+                if (validationData.supabaseUser) {
+                    log('complete-result', 'Step 2: Token validation ✓', 'success');
+                    log('complete-result', `User: ${validationData.supabaseUser.email}`, 'info');
+                } else {
+                    log('complete-result', 'Step 2: Token validation ✗', 'error');
+                    log('complete-result', `Error: ${validationData.supabaseError}`, 'error');
+                    return;
+                }
+            } catch (error) {
+                log('complete-result', `Step 2: Validation failed - ${error.message}`, 'error');
+                return;
+            }
+            
+            // Step 3: Test onboarding
+            log('complete-result', 'Step 3: Testing onboarding...', 'info');
+            try {
+                const formData = new FormData();
+                formData.append('shopName', 'Complete Flow Test ' + Date.now());
+                formData.append('subdomain', 'flowtest' + Date.now());
+                
+                const onboardingResponse = await fetch(`${BASE_URL}/onboarding`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${accessToken}` },
+                    body: formData
+                });
+                
+                if (onboardingResponse.ok) {
+                    log('complete-result', 'Step 3: Onboarding ✓', 'success');
+                    log('complete-result', 'COMPLETE FLOW SUCCESS! 🎉', 'success');
+                } else {
+                    const errorText = await onboardingResponse.text();
+                    log('complete-result', 'Step 3: Onboarding ✗', 'error');
+                    log('complete-result', `Error: ${errorText}`, 'error');
+                }
+            } catch (error) {
+                log('complete-result', `Step 3: Onboarding failed - ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-check tokens on page load
+        window.addEventListener('load', () => {
+            checkTokens();
+            
+            // Check if we're coming back from OAuth
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('oauth') === 'complete') {
+                log('oauth-result', 'Returned from OAuth flow', 'success');
+                setTimeout(checkTokens, 1000);
+            }
+        });
+    </script>
+</body>
+</html>

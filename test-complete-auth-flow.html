@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Auth Flow Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        button { margin: 5px; padding: 10px 15px; cursor: pointer; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+        .warning { color: orange; }
+        pre { background: #f5f5f5; padding: 10px; overflow-x: auto; font-size: 12px; }
+        .log { max-height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; margin: 10px 0; }
+        input { padding: 8px; margin: 5px; width: 200px; }
+    </style>
+</head>
+<body>
+    <h1>Complete Authentication Flow Test</h1>
+    <p>This page tests the complete authentication flow for ClubeeShopMkt</p>
+    
+    <div class="section">
+        <h2>🔍 Step 1: Environment Check</h2>
+        <button onclick="checkEnvironment()">Check Environment</button>
+        <div id="envCheck" class="log"></div>
+    </div>
+
+    <div class="section">
+        <h2>🔐 Step 2: Test Email/Password Signup</h2>
+        <input type="email" id="testEmail" placeholder="test@example.com" value="test@example.com">
+        <input type="password" id="testPassword" placeholder="password" value="testpass123">
+        <br>
+        <button onclick="testEmailSignup()">Test Email Signup</button>
+        <button onclick="testEmailLogin()">Test Email Login</button>
+        <div id="emailAuth" class="log"></div>
+    </div>
+
+    <div class="section">
+        <h2>🌐 Step 3: Test Google OAuth Flow</h2>
+        <p>This will initiate the Google OAuth flow in a new window</p>
+        <button onclick="testGoogleOAuth()">Start Google OAuth</button>
+        <button onclick="checkOAuthResult()">Check OAuth Result</button>
+        <div id="oauthTest" class="log"></div>
+    </div>
+
+    <div class="section">
+        <h2>🏪 Step 4: Test Onboarding</h2>
+        <input type="text" id="testShopName" placeholder="Test Shop" value="Test Shop">
+        <input type="text" id="testSubdomain" placeholder="testshop" value="testshop123">
+        <br>
+        <button onclick="testOnboarding()">Test Onboarding</button>
+        <div id="onboardingTest" class="log"></div>
+    </div>
+
+    <div class="section">
+        <h2>🔧 Step 5: Debug Tools</h2>
+        <button onclick="showStoredTokens()">Show Stored Tokens</button>
+        <button onclick="clearAllTokens()">Clear All Tokens</button>
+        <button onclick="testServerDebug()">Test Server Debug</button>
+        <div id="debugTools" class="log"></div>
+    </div>
+
+    <script>
+        const BASE_URL = 'https://eshop.clubemkt.digital';
+        
+        function log(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'error' ? 'error' : type === 'success' ? 'success' : type === 'warning' ? 'warning' : 'info';
+            element.innerHTML += `<div class="${className}">[${timestamp}] ${message}</div>`;
+            element.scrollTop = element.scrollHeight;
+        }
+
+        function clearLog(elementId) {
+            document.getElementById(elementId).innerHTML = '';
+        }
+
+        async function checkEnvironment() {
+            clearLog('envCheck');
+            log('envCheck', 'Checking environment...', 'info');
+            
+            try {
+                // Test basic connectivity
+                const response = await fetch(`${BASE_URL}/`);
+                log('envCheck', `✓ Site accessible (${response.status})`, 'success');
+                
+                // Check if signup page loads
+                const signupResponse = await fetch(`${BASE_URL}/signup`);
+                log('envCheck', `✓ Signup page accessible (${signupResponse.status})`, 'success');
+                
+                // Check if onboarding page loads
+                const onboardingResponse = await fetch(`${BASE_URL}/onboarding`);
+                log('envCheck', `✓ Onboarding page accessible (${onboardingResponse.status})`, 'success');
+                
+                // Check debug endpoint
+                const debugResponse = await fetch(`${BASE_URL}/api/debug-tokens`);
+                log('envCheck', `✓ Debug API accessible (${debugResponse.status})`, 'success');
+                
+                log('envCheck', '✅ Environment check complete', 'success');
+                
+            } catch (error) {
+                log('envCheck', `❌ Environment check failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function testEmailSignup() {
+            clearLog('emailAuth');
+            const email = document.getElementById('testEmail').value;
+            const password = document.getElementById('testPassword').value;
+            
+            if (!email || !password) {
+                log('emailAuth', '❌ Please enter email and password', 'error');
+                return;
+            }
+            
+            log('emailAuth', `Testing email signup for: ${email}`, 'info');
+            
+            try {
+                const formData = new FormData();
+                formData.append('email', email);
+                formData.append('password', password);
+                formData.append('confirmPassword', password);
+                
+                const response = await fetch(`${BASE_URL}/signup`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                log('emailAuth', `Signup response: ${response.status}`, response.ok ? 'success' : 'error');
+                
+                const responseText = await response.text();
+                
+                // Check if we got redirected or got JSON response
+                if (response.ok && responseText.includes('<!DOCTYPE html>')) {
+                    log('emailAuth', '✓ Signup successful (got HTML response)', 'success');
+                    // Check if tokens were set
+                    setTimeout(() => {
+                        const accessToken = localStorage.getItem('sb-access-token');
+                        if (accessToken) {
+                            log('emailAuth', '✓ Access token stored after signup', 'success');
+                        } else {
+                            log('emailAuth', '⚠️ No access token found after signup', 'warning');
+                        }
+                    }, 1000);
+                } else {
+                    try {
+                        const jsonResponse = JSON.parse(responseText);
+                        log('emailAuth', `Response: ${JSON.stringify(jsonResponse)}`, jsonResponse.error ? 'error' : 'info');
+                    } catch (e) {
+                        log('emailAuth', `Response (first 200 chars): ${responseText.substring(0, 200)}`, 'info');
+                    }
+                }
+                
+            } catch (error) {
+                log('emailAuth', `❌ Signup failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function testEmailLogin() {
+            clearLog('emailAuth');
+            const email = document.getElementById('testEmail').value;
+            const password = document.getElementById('testPassword').value;
+            
+            if (!email || !password) {
+                log('emailAuth', '❌ Please enter email and password', 'error');
+                return;
+            }
+            
+            log('emailAuth', `Testing email login for: ${email}`, 'info');
+            
+            try {
+                const formData = new FormData();
+                formData.append('email', email);
+                formData.append('password', password);
+                
+                const response = await fetch(`${BASE_URL}/login`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                log('emailAuth', `Login response: ${response.status}`, response.ok ? 'success' : 'error');
+                
+                const responseText = await response.text();
+                
+                if (response.ok) {
+                    log('emailAuth', '✓ Login successful', 'success');
+                    // Check if tokens were set
+                    setTimeout(() => {
+                        const accessToken = localStorage.getItem('sb-access-token');
+                        if (accessToken) {
+                            log('emailAuth', '✓ Access token stored after login', 'success');
+                        } else {
+                            log('emailAuth', '⚠️ No access token found after login', 'warning');
+                        }
+                    }, 1000);
+                } else {
+                    try {
+                        const jsonResponse = JSON.parse(responseText);
+                        log('emailAuth', `Error: ${JSON.stringify(jsonResponse)}`, 'error');
+                    } catch (e) {
+                        log('emailAuth', `Response (first 200 chars): ${responseText.substring(0, 200)}`, 'error');
+                    }
+                }
+                
+            } catch (error) {
+                log('emailAuth', `❌ Login failed: ${error.message}`, 'error');
+            }
+        }
+
+        function testGoogleOAuth() {
+            clearLog('oauthTest');
+            log('oauthTest', 'Starting Google OAuth flow...', 'info');
+            
+            // Create a form and submit it to trigger OAuth
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `${BASE_URL}/signup`;
+            form.target = '_blank'; // Open in new window
+            
+            const actionInput = document.createElement('input');
+            actionInput.type = 'hidden';
+            actionInput.name = 'action';
+            actionInput.value = 'google';
+            form.appendChild(actionInput);
+            
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+            
+            log('oauthTest', '✓ OAuth window opened. Complete the flow and click "Check OAuth Result"', 'success');
+        }
+
+        function checkOAuthResult() {
+            clearLog('oauthTest');
+            log('oauthTest', 'Checking OAuth result...', 'info');
+            
+            const accessToken = localStorage.getItem('sb-access-token');
+            const refreshToken = localStorage.getItem('sb-refresh-token');
+            
+            if (accessToken) {
+                log('oauthTest', '✓ Access token found!', 'success');
+                log('oauthTest', `Token length: ${accessToken.length}`, 'info');
+                
+                // Try to decode the token
+                try {
+                    const payload = accessToken.split('.')[1];
+                    const decoded = JSON.parse(atob(payload));
+                    log('oauthTest', `User ID: ${decoded.sub}`, 'info');
+                    log('oauthTest', `Email: ${decoded.email}`, 'info');
+                    log('oauthTest', `Expires: ${new Date(decoded.exp * 1000).toLocaleString()}`, 'info');
+                } catch (e) {
+                    log('oauthTest', '⚠️ Could not decode token', 'warning');
+                }
+            } else {
+                log('oauthTest', '❌ No access token found', 'error');
+            }
+            
+            if (refreshToken) {
+                log('oauthTest', '✓ Refresh token found!', 'success');
+            } else {
+                log('oauthTest', '❌ No refresh token found', 'error');
+            }
+        }
+
+        async function testOnboarding() {
+            clearLog('onboardingTest');
+            const shopName = document.getElementById('testShopName').value;
+            const subdomain = document.getElementById('testSubdomain').value;
+            const accessToken = localStorage.getItem('sb-access-token');
+            
+            if (!accessToken) {
+                log('onboardingTest', '❌ No access token found. Please complete authentication first.', 'error');
+                return;
+            }
+            
+            if (!shopName || !subdomain) {
+                log('onboardingTest', '❌ Please enter shop name and subdomain', 'error');
+                return;
+            }
+            
+            log('onboardingTest', `Testing onboarding: ${shopName} (${subdomain})`, 'info');
+            
+            try {
+                const formData = new FormData();
+                formData.append('shopName', shopName);
+                formData.append('subdomain', subdomain);
+                
+                const response = await fetch(`${BASE_URL}/onboarding`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    },
+                    body: formData
+                });
+                
+                log('onboardingTest', `Onboarding response: ${response.status}`, response.ok ? 'success' : 'error');
+                
+                const responseText = await response.text();
+                
+                try {
+                    const jsonResponse = JSON.parse(responseText);
+                    log('onboardingTest', `Response: ${JSON.stringify(jsonResponse, null, 2)}`, jsonResponse.success ? 'success' : 'error');
+                    
+                    if (jsonResponse.success) {
+                        log('onboardingTest', '🎉 Onboarding successful!', 'success');
+                    }
+                } catch (e) {
+                    log('onboardingTest', `Response (first 300 chars): ${responseText.substring(0, 300)}`, 'info');
+                }
+                
+            } catch (error) {
+                log('onboardingTest', `❌ Onboarding failed: ${error.message}`, 'error');
+            }
+        }
+
+        function showStoredTokens() {
+            clearLog('debugTools');
+            log('debugTools', 'Checking stored tokens...', 'info');
+            
+            const accessToken = localStorage.getItem('sb-access-token');
+            const refreshToken = localStorage.getItem('sb-refresh-token');
+            
+            if (accessToken) {
+                log('debugTools', `✓ Access Token: ${accessToken.substring(0, 50)}...`, 'success');
+                log('debugTools', `  Length: ${accessToken.length}`, 'info');
+                
+                try {
+                    const payload = accessToken.split('.')[1];
+                    const decoded = JSON.parse(atob(payload));
+                    log('debugTools', `  User: ${decoded.email} (${decoded.sub})`, 'info');
+                    log('debugTools', `  Expires: ${new Date(decoded.exp * 1000).toLocaleString()}`, 'info');
+                    log('debugTools', `  Expired: ${Date.now() / 1000 > decoded.exp ? 'Yes' : 'No'}`, decoded.exp < Date.now() / 1000 ? 'error' : 'success');
+                } catch (e) {
+                    log('debugTools', '  ⚠️ Could not decode token', 'warning');
+                }
+            } else {
+                log('debugTools', '❌ No access token', 'error');
+            }
+            
+            if (refreshToken) {
+                log('debugTools', `✓ Refresh Token: ${refreshToken.substring(0, 30)}...`, 'success');
+            } else {
+                log('debugTools', '❌ No refresh token', 'error');
+            }
+        }
+
+        function clearAllTokens() {
+            localStorage.removeItem('sb-access-token');
+            localStorage.removeItem('sb-refresh-token');
+            log('debugTools', '✓ All tokens cleared', 'success');
+        }
+
+        async function testServerDebug() {
+            clearLog('debugTools');
+            const accessToken = localStorage.getItem('sb-access-token');
+            
+            if (!accessToken) {
+                log('debugTools', '❌ No access token to test', 'error');
+                return;
+            }
+            
+            log('debugTools', 'Testing server-side token validation...', 'info');
+            
+            try {
+                const response = await fetch(`${BASE_URL}/api/debug-tokens`, {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+                
+                const data = await response.json();
+                log('debugTools', `Server response (${response.status}):`, response.ok ? 'success' : 'error');
+                log('debugTools', JSON.stringify(data, null, 2), 'info');
+                
+            } catch (error) {
+                log('debugTools', `❌ Server debug failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-check environment on load
+        window.addEventListener('load', () => {
+            checkEnvironment();
+        });
+    </script>
+</body>
+</html>
